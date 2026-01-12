@@ -20,6 +20,13 @@ public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
+
+public function getFormattedPriceAttribute()
+{
+    return 'Rp ' . number_format($this->price, 0, ',', '.');
+}
+
+
 public function getFormattedDurationAttribute()
 {
     if ($this->duration >= 60) {
