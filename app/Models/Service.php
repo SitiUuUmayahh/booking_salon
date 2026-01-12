@@ -20,4 +20,17 @@ public function bookings()
 {
     return $this->hasMany(Booking::class);
 }
+public function getFormattedDurationAttribute()
+{
+    if ($this->duration >= 60) {
+        $hours = floor($this->duration / 60);
+        $minute = $this->duration % 60;
+
+        if ($minutes > 0) {
+            return $hours . 'jam' . $minutes . 'menit';
+        }
+        return $hours . 'jam';
+    }
+    return $this->duration . 'menit';
+}
 }
