@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,44 @@ use App\Http\Controllers\BookingController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+/*
+|--------------------------------------------------------------------------
+| Guest Routes - Hanya untuk user yang belum login
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    // Tampilkan form login
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+
+    // Proses login
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+    // Tampilkan form register
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+
+    // Proses register
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected Routes - Hanya untuk user yang sudah login
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes - Bisa diakses siapa saja
+|--------------------------------------------------------------------------
+*/
+// Dashboard (sementara tampilkan welcome default dulu)
+Route::get('/', function () {
+    return view('welcome');
+})->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
