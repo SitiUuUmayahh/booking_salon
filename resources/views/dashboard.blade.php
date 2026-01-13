@@ -32,7 +32,12 @@
                                 <span class="text-sm text-gray-500">⏱️ {{ $service->formatted_duration }}</span>
                             </div>
 
-                            <button onclick="openBookingModal({{ $service->id }}, '{{ $service->name }}')" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                            <button 
+                                type="button"
+                                data-booking-btn
+                                data-service-id="{{ $service->id }}"
+                                data-service-name="{{ $service->name }}"
+                                class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
                                 Booking Sekarang
                             </button>
                         </div>
@@ -153,6 +158,15 @@
 </div>
 
 <script>
+// Attach booking button handlers without inline JS
+document.querySelectorAll('[data-booking-btn]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var serviceId = btn.getAttribute('data-service-id');
+        var serviceName = btn.getAttribute('data-service-name');
+        openBookingModal(serviceId, serviceName);
+    });
+});
+
 function openBookingModal(serviceId, serviceName) {
     document.getElementById('modal_service_id').value = serviceId;
     document.getElementById('modal_service_name').textContent = serviceName;
