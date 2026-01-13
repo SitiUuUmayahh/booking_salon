@@ -140,7 +140,7 @@
 
                 <!-- Back to Home -->
                 <div class="mt-4 text-center">
-                    <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-gray-700">
+                    <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-700">
                         ← Kembali ke Beranda
                     </a>
                 </div>

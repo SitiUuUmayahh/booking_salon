@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
 // Home page (welcome)
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 /*
 |--------------------------------------------------------------------------
