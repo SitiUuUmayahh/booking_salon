@@ -49,25 +49,21 @@ Route::middleware('auth')->group(function () {
 | Public Routes - Bisa diakses siapa saja
 |--------------------------------------------------------------------------
 */
-// Dashboard (sementara tampilkan welcome default dulu)
+// Home page (welcome)
 Route::get('/', function () {
     return view('welcome');
-})->name('dashboard');
+});
 
-
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (Auth) - Routes for authenticated users
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Bookings (user facing)
-    Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-    Route::get('/bookings/history', [BookingController::class, 'history'])->name('bookings.history');
-    Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
-});
-
-Route::middleware('auth')->group(function () {
-    // Booking routes
+    // Bookings
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/history', [BookingController::class, 'history'])->name('bookings.history');
     Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
