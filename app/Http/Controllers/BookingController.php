@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -96,9 +97,9 @@ class BookingController extends Controller
         if ($booking->user_id !== Auth::id()) {
             abort(403);
         }
-        if ($booking->status !== 'pending') {
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
             return back()->withErrors([
-                'error' => 'Booking yang sudah dikonfirmasi tidak bisa dibatalkan. Silakan hubungi admin.'
+                'error' => 'Booking ini tidak dapat dibatalkan.'
             ]);
         }
         $booking->update(['status' => 'cancelled']);
@@ -106,4 +107,5 @@ class BookingController extends Controller
         return redirect()->route('bookings.history')
             ->with('success', 'Booking berhasil dibatalkan');
     }
+
 }
