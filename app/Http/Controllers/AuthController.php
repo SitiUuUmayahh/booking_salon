@@ -36,7 +36,7 @@ class AuthController extends Controller
             'password.required' => 'Password harus diisi',
         ]);
 
-        // Coba login
+        // mencoba login
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
             
