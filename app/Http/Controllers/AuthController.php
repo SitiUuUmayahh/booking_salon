@@ -15,11 +15,9 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
-        // Jika user sudah login, redirect ke dashboard
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-
         return view('auth.login');
     }
 
@@ -38,21 +36,25 @@ class AuthController extends Controller
             'password.required' => 'Password harus diisi',
         ]);
 
-        // Cek kredensial dengan Auth::attempt()
-        // Ini otomatis akan compare password dengan hash di database
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            // Regenerate session ID untuk keamanan (mencegah session fixation)
+        // Coba login
+        if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
-
-            // Redirect ke halaman yang dituju atau dashboard
+            
+            // CEK ROLE: Redirect berdasarkan role user
+            if (Auth::user()->role === 'admin') {
+                // jika admin, redirect ke admin dashboard
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', 'Selamat datang Admin!');
+            }
+            
             return redirect()->intended(route('dashboard'))
-                ->with('success', 'Login berhasil! Selamat datang, ' . Auth::user()->name);
+                ->with('success', 'Login berhasil!');
         }
-
-        // Jika kredensial salah, kembali ke form login dengan error
-        return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        
+        // Jika login gagal
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => 'Email atau password salah']);
     }
 
     /**
@@ -60,11 +62,9 @@ class AuthController extends Controller
      */
     public function showRegisterForm()
     {
-        // Jika user sudah login, redirect ke dashboard
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-
         return view('auth.register');
     }
 
@@ -73,7 +73,6 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -83,25 +82,22 @@ class AuthController extends Controller
             'name.required' => 'Nama lengkap harus diisi',
             'email.required' => 'Email harus diisi',
             'email.email' => 'Format email tidak valid',
-            'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain',
+            'email.unique' => 'Email sudah terdaftar',
             'password.required' => 'Password harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
             'password.min' => 'Password minimal 8 karakter',
         ]);
 
-        // Buat user baru
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'password' => Hash::make($validated['password']),
-            'role' => 'user', // Default role adalah user
+            'role' => 'user',
         ]);
 
-        // Login otomatis setelah register
         Auth::login($user);
 
-        // Redirect ke dashboard dengan pesan sukses
         return redirect()->route('dashboard')
             ->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name);
     }
@@ -111,17 +107,11 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Logout user
         Auth::logout();
-
-        // Invalidate session
         $request->session()->invalidate();
-
-        // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        // Redirect ke dashboard sebagai guest
-        return redirect()->route('dashboard')
+        return redirect()->route('home')
             ->with('success', 'Anda telah berhasil logout');
     }
 }
