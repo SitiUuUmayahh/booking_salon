@@ -14,6 +14,7 @@ protected $fillable = [
     'description',
     'price',
     'duration',
+    'image',
 ];
 
 public function bookings()
@@ -31,13 +32,13 @@ public function getFormattedDurationAttribute()
 {
     if ($this->duration >= 60) {
         $hours = floor($this->duration / 60);
-        $minute = $this->duration % 60;
+        $minutes = $this->duration % 60;
 
         if ($minutes > 0) {
-            return $hours . 'jam' . $minutes . 'menit';
+            return $hours . ' jam ' . $minutes . ' menit';
         }
-        return $hours . 'jam';
+        return $hours . ' jam';
     }
-    return $this->duration . 'menit';
+    return $this->duration . ' menit';
 }
 }
