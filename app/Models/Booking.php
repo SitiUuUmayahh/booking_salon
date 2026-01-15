@@ -39,7 +39,7 @@ public function getFormattedDateAttribute()
 {
     return Carbon::parse($this->booking_date)
         ->locale('id')
-        ->translatedFormat('dddd, D MMMM YYYY');
+        ->translatedFormat('d, D M Y');
 }
 
 public function getFormattedTimeAttribute()

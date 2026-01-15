@@ -19,52 +19,38 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        // Statistik umum
-        $stats = [
-            // Total bookings
-            'total_bookings' => Booking::count(),
-            
-            // Booking pending (menunggu konfirmasi)
-            'pending_bookings' => Booking::where('status', 'pending')->count(),
-            
-            // Booking hari ini
-            'today_bookings' => Booking::whereDate('booking_date', Carbon::today())->count(),
-            
-            // Total revenue dari booking completed
-            'total_revenue' => Booking::where('status', 'completed')
-                ->join('services', 'bookings.service_id', '=', 'services.id')
-                ->sum('services.price'),
-            
-            // Total customers (users)
-            'total_customers' => User::where('role', 'user')->count(),
-            
-            // Total services
-            'total_services' => Service::count(),
-        ];
-
+        // Ambil statistik untuk view
+        $totalBookings = Booking::count();
+        $pendingBookings = Booking::where('status', 'pending')->count();
+        $confirmedBookings = Booking::where('status', 'confirmed')->count();
+        $cancelledBookings = Booking::where('status', 'cancelled')->count();
+        
         // Booking terbaru (10 terakhir)
-        $recent_bookings = Booking::with(['user', 'service'])
+        $recentBookings = Booking::with(['user', 'service'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
         // Booking hari ini
-        $today_bookings = Booking::with(['user', 'service'])
+        $todayBookings = Booking::with(['user', 'service'])
             ->whereDate('booking_date', Carbon::today())
             ->orderBy('booking_time', 'asc')
             ->get();
 
         // Service paling populer
-        $popular_services = Service::withCount('bookings')
+        $popularServices = Service::withCount('bookings')
             ->orderBy('bookings_count', 'desc')
             ->limit(5)
             ->get();
 
         return view('admin.dashboard', compact(
-            'stats',
-            'recent_bookings',
-            'today_bookings',
-            'popular_services'
+            'totalBookings',
+            'pendingBookings',
+            'confirmedBookings',
+            'cancelledBookings',
+            'recentBookings',
+            'todayBookings',
+            'popularServices'
         ));
     }
 
