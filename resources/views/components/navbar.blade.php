@@ -24,6 +24,7 @@
 
             <!-- User Menu -->
             <div class="flex items-center">
+                @auth
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center text-gray-700 hover:text-pink-600 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,6 +49,16 @@
                         </form>
                     </div>
                 </div>
+                @else
+                <div class="flex items-center space-x-2">
+                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-pink-600 px-4 py-2 rounded-md text-sm font-medium">
+                        Masuk
+                    </a>
+                    <a href="{{ route('register') }}" class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105">
+                        Daftar
+                    </a>
+                </div>
+                @endauth
             </div>
 
             <!-- Mobile menu button -->
@@ -64,6 +75,7 @@
     <!-- Mobile Menu -->
     <div x-show="mobileOpen" class="md:hidden" x-data="{ mobileOpen: false }">
         <div class="px-2 pt-2 pb-3 space-y-1">
+            @auth
             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
                 Dashboard
             </a>
@@ -79,6 +91,17 @@
                     Logout
                 </button>
             </form>
+            @else
+            <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
+                Layanan
+            </a>
+            <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
+                Masuk
+            </a>
+            <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700">
+                Daftar
+            </a>
+            @endauth
         </div>
     </div>
 </nav>
