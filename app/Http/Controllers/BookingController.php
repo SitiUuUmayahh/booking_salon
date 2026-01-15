@@ -11,6 +11,20 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    /**
+     * Menampilkan form create booking untuk service tertentu
+     */
+    public function create(Request $request)
+    {
+        $service = null;
+        if ($request->has('service_id')) {
+            $service = Service::findOrFail($request->get('service_id'));
+        }
+        
+        $services = Service::all();
+        return view('bookings.create', compact('service', 'services'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
