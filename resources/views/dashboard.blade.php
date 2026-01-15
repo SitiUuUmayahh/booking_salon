@@ -67,6 +67,88 @@
                 </div>
             </div>
         </div>
+
+        <!-- Riwayat Booking Section -->
+        <div class="mt-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Riwayat Booking Saya</h2>
+                <a href="{{ route('bookings.history') }}" class="text-pink-600 hover:text-pink-700 font-semibold text-sm">
+                    Lihat Semua →
+                </a>
+            </div>
+
+            @if($bookings->isEmpty())
+                <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Belum Ada Booking</h3>
+                    <p class="text-gray-500">Mulai dengan memilih layanan di atas untuk membuat booking pertama Anda</p>
+                </div>
+            @else
+                <div class="space-y-4">
+                    @foreach($bookings->take(5) as $booking)
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div class="flex items-center justify-between p-6">
+                                <!-- Left Section -->
+                                <div class="flex-1">
+                                    <div class="flex items-start space-x-4">
+                                        <!-- Service Icon -->
+                                        <div class="bg-pink-100 rounded-lg p-3 h-fit">
+                                            <span class="text-2xl">💇</span>
+                                        </div>
+                                        
+                                        <!-- Booking Details -->
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-gray-900">{{ $booking->service->name }}</h3>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                📅 {{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }} 
+                                                at {{ date('H:i', strtotime($booking->booking_time)) }}
+                                            </p>
+                                            <p class="text-sm text-gray-500 mt-1">
+                                                ID: {{ substr($booking->id, 0, 8) }}...
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Status Badge -->
+                                <div class="flex items-center space-x-4">
+                                    @php
+                                        $statusClass = match($booking->status) {
+                                            'pending' => 'bg-yellow-100 text-yellow-800',
+                                            'confirmed' => 'bg-blue-100 text-blue-800',
+                                            'completed' => 'bg-green-100 text-green-800',
+                                            'cancelled' => 'bg-red-100 text-red-800',
+                                            default => 'bg-gray-100 text-gray-800'
+                                        };
+                                    @endphp
+                                    <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusClass }}">
+                                        {{ ucfirst($booking->status) }}
+                                    </span>
+
+                                    <!-- Action -->
+                                    <div class="flex space-x-2">
+                                        <a href="{{ route('bookings.show', $booking) }}" class="text-pink-600 hover:text-pink-700 font-semibold text-sm">
+                                            Detail
+                                        </a>
+                                        @if($booking->status === 'pending')
+                                            <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
+                                                @csrf
+                                                @method('POST')
+                                                <button type="submit" class="text-red-600 hover:text-red-700 font-semibold text-sm">
+                                                    Batal
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 

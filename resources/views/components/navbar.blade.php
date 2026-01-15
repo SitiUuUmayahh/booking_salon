@@ -14,6 +14,9 @@
                 <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-pink-600 font-semibold' : '' }}">
                     Dashboard
                 </a>
+                <a href="{{ route('services.index') }}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('services.*') ? 'text-pink-600 font-semibold' : '' }}">
+                    Layanan
+                </a>
                 <a href="{{ route('bookings.history') }}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('bookings.*') ? 'text-pink-600 font-semibold' : '' }}">
                     Riwayat Booking
                 </a>
@@ -63,6 +66,9 @@
         <div class="px-2 pt-2 pb-3 space-y-1">
             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
                 Dashboard
+            </a>
+            <a href="{{ route('services.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
+                Layanan
             </a>
             <a href="{{ route('bookings.history') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-gray-50">
                 Riwayat Booking
