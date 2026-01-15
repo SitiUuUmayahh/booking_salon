@@ -10,44 +10,44 @@ use Carbon\Carbon;
 class Booking extends Model
 {
     use HasFactory;
-protected $fillable = [
-    'user_id',
-    'service_id',
-    'customer_name',
-    'booking_date',
-    'booking_time',
-    'notes',
-    'status',
-];
+    protected $fillable = [
+        'user_id',
+        'service_id',
+        'customer_name',
+        'booking_date',
+        'booking_time',
+        'notes',
+        'status',
+    ];
 
-protected $casts = [
-    'booking_date' => 'date',
-    'booking_time' => 'datetime',
-];
+    protected $casts = [
+        'booking_date' => 'date',
+        'booking_time' => 'datetime',
+    ];
 
-public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-public function service()
-{
-    return $this->belongsTo(Service::class);
-}
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 
-public function getFormattedDateAttribute()
-{
-    return Carbon::parse($this->booking_date)
-        ->locale('id')
-        ->translatedFormat('d, D M Y');
-}
+    public function getFormattedDateAttribute()
+    {
+        return Carbon::parse($this->booking_date)
+            ->locale('id')
+            ->translatedFormat('d, D M Y');
+    }
 
-public function getFormattedTimeAttribute()
+    public function getFormattedTimeAttribute()
     {
         return Carbon::parse($this->booking_time)->format('H:i');
     }
 
-public function getStatusBadgeAttribute()
+    public function getStatusBadgeAttribute()
     {
         $badges = [
             'pending' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>',

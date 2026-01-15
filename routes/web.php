@@ -29,6 +29,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::redirect('/home', '/dashboard');
+
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
 
