@@ -219,4 +219,29 @@ class AdminBookingController extends Controller
         ]);
 
         return back()->with('success', 'Pembayaran DP ditolak. Customer akan diminta upload ulang.');
-    }}
+    }
+
+    /**
+     * View bukti pembayaran DP
+     *
+     * Route: GET /admin/bookings/{id}/dp-proof-view
+     */
+    public function viewDpProof($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Validasi: pastikan file ada
+        if (!$booking->dp_payment_proof) {
+            abort(404, 'Bukti pembayaran DP tidak ditemukan');
+        }
+
+        // Validasi: pastikan file exists di storage
+        $filePath = storage_path('app/public/' . $booking->dp_payment_proof);
+        if (!file_exists($filePath)) {
+            abort(404, 'File bukti pembayaran tidak ditemukan di server');
+        }
+
+        // Return file as image
+        return response()->file($filePath);
+    }
+}

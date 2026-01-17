@@ -221,11 +221,11 @@
                     </h3>
                 </div>
                 <div class="p-6">
-                    <a href="{{ asset('storage/' . $booking->dp_payment_proof) }}" target="_blank" class="block group">
+                    <a href="{{ route('admin.bookings.dp-proof-view', $booking->id) }}" target="_blank" class="block group">
                         <div class="relative overflow-hidden rounded-lg border-2 border-gray-200 group-hover:border-blue-400 transition">
-                            <img src="{{ asset('storage/' . $booking->dp_payment_proof) }}"
+                            <img src="{{ route('admin.bookings.dp-proof-view', $booking->id) }}"
                                  alt="Bukti DP"
-                                 class="w-full h-auto group-hover:scale-105 transition duration-300">
+                                 class="w-full max-h-96 object-cover group-hover:scale-102 transition duration-300">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition flex items-center justify-center">
                                 <svg class="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />

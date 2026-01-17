@@ -54,6 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // DP Management
     Route::post('/bookings/{id}/verify-dp', [AdminBookingController::class, 'verifyDp'])->name('bookings.verify-dp');
     Route::post('/bookings/{id}/reject-dp', [AdminBookingController::class, 'rejectDp'])->name('bookings.reject-dp');
+    Route::get('/bookings/{id}/dp-proof-view', [AdminBookingController::class, 'viewDpProof'])->name('bookings.dp-proof-view');
 
     // User Management
     Route::post('/users/{id}/unsuspend', [AdminController::class, 'unsuspendUser'])->name('users.unsuspend');
