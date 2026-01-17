@@ -10,7 +10,7 @@ class AdminBookingController extends Controller
 {
     /**
      * Menampilkan semua booking
-     * 
+     *
      * Route: GET /admin/bookings
      * View: admin/bookings/index.blade.php (Anggota 5 yang buat)
      */
@@ -61,20 +61,20 @@ class AdminBookingController extends Controller
 
     /**
      * Menampilkan detail booking
-     * 
+     *
      * Route: GET /admin/bookings/{id}
      * View: admin/bookings/show.blade.php (Anggota 5 yang buat)
      */
     public function show($id)
     {
         $booking = Booking::with(['user', 'service'])->findOrFail($id);
-        
+
         return view('admin.bookings.show', compact('booking'));
     }
 
     /**
      * Konfirmasi booking (ubah status dari pending ke confirmed)
-     * 
+     *
      * Route: POST /admin/bookings/{id}/confirm
      */
     public function confirm($id)
@@ -103,7 +103,7 @@ class AdminBookingController extends Controller
 
     /**
      * Selesaikan booking (ubah status ke completed)
-     * 
+     *
      * Route: POST /admin/bookings/{id}/complete
      */
     public function complete($id)
@@ -125,7 +125,7 @@ class AdminBookingController extends Controller
 
     /**
      * Batalkan booking (ubah status ke cancelled)
-     * 
+     *
      * Route: POST /admin/bookings/{id}/cancel
      */
     public function cancel(Request $request, $id)
@@ -147,7 +147,7 @@ class AdminBookingController extends Controller
 
     /**
      * Hapus booking
-     * 
+     *
      * Route: DELETE /admin/bookings/{id}
      */
     public function destroy($id)
@@ -169,7 +169,7 @@ class AdminBookingController extends Controller
 
     /**
      * Verifikasi pembayaran DP
-     * 
+     *
      * Route: POST /admin/bookings/{id}/verify-dp
      */
     public function verifyDp($id)
@@ -193,7 +193,7 @@ class AdminBookingController extends Controller
 
     /**
      * Tolak pembayaran DP
-     * 
+     *
      * Route: POST /admin/bookings/{id}/reject-dp
      */
     public function rejectDp(Request $request, $id)

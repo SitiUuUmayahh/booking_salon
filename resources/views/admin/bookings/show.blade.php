@@ -19,7 +19,7 @@
             {!! $booking->dp_status_badge !!}
         </div>
     </div>
-    
+
     <!-- Booking ID Badge -->
     <div class="mt-4 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg p-6 text-white">
         <div class="flex items-center justify-between">
@@ -223,8 +223,8 @@
                 <div class="p-6">
                     <a href="{{ asset('storage/' . $booking->dp_payment_proof) }}" target="_blank" class="block group">
                         <div class="relative overflow-hidden rounded-lg border-2 border-gray-200 group-hover:border-blue-400 transition">
-                            <img src="{{ asset('storage/' . $booking->dp_payment_proof) }}" 
-                                 alt="Bukti DP" 
+                            <img src="{{ asset('storage/' . $booking->dp_payment_proof) }}"
+                                 alt="Bukti DP"
                                  class="w-full h-auto group-hover:scale-105 transition duration-300">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition flex items-center justify-center">
                                 <svg class="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@
                         </button>
                     </form>
 
-                    <button onclick="document.getElementById('rejectModal').classList.remove('hidden')" 
+                    <button onclick="document.getElementById('rejectModal').classList.remove('hidden')"
                             class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-4 px-4 rounded-lg transition transform hover:scale-105 shadow-lg">
                         <span class="flex items-center justify-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,12 +423,12 @@
                           placeholder="Contoh: Bukti transfer tidak jelas, nominal tidak sesuai, dll"></textarea>
             </div>
             <div class="flex space-x-3">
-                <button type="button" 
+                <button type="button"
                         onclick="document.getElementById('rejectModal').classList.add('hidden')"
                         class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-4 rounded-lg transition">
                     Batal
                 </button>
-                <button type="submit" 
+                <button type="submit"
                         class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition">
                     Tolak DP
                 </button>
