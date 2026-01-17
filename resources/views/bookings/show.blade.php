@@ -136,13 +136,106 @@
                     </div>
                 </div>
 
+                <!-- Down Payment (DP) Section -->
+                <div class="mb-8 border-t-4 border-pink-500 bg-pink-50 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        💳 Down Payment (DP 50%)
+                    </h2>
+
+                    <!-- Payment Info -->
+                    <div class="bg-white rounded-lg p-6 mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Harga</p>
+                                <p class="text-xl font-bold text-gray-800">{{ $booking->service->formatted_price }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">DP yang Harus Dibayar (50%)</p>
+                                <p class="text-xl font-bold text-pink-600">{{ $booking->formatted_dp_amount }}</p>
+                            </div>
+                        </div>
+                        <div class="border-t pt-4">
+                            <p class="text-sm text-gray-600">Sisa Pembayaran (dibayar saat datang)</p>
+                            <p class="text-2xl font-bold text-green-600">{{ $booking->remaining_payment }}</p>
+                        </div>
+                    </div>
+
+                    <!-- DP Status -->
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-2">Status Pembayaran DP:</p>
+                        {!! $booking->dp_status_badge !!}
+                    </div>
+
+                    <!-- Bank Account Info -->
+                    @if($booking->dp_status === 'unpaid' || $booking->dp_status === 'rejected')
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <p class="font-semibold text-blue-800 mb-2">📋 Transfer ke Rekening:</p>
+                            <div class="text-blue-900">
+                                <p><strong>Bank:</strong> BCA</p>
+                                <p><strong>No. Rekening:</strong> 1234567890</p>
+                                <p><strong>Atas Nama:</strong> Dsisi Salon</p>
+                                <p class="mt-2 text-sm text-blue-700">⚠️ Transfer tepat <strong>{{ $booking->formatted_dp_amount }}</strong> untuk mempermudah verifikasi</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Upload Bukti DP -->
+                    @if($booking->dp_status === 'unpaid' || $booking->dp_status === 'rejected')
+                        @if($booking->dp_status === 'rejected')
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                                <p class="font-semibold text-red-800 mb-1">❌ Bukti Pembayaran Ditolak</p>
+                                <p class="text-sm text-red-700">{{ $booking->dp_rejection_reason }}</p>
+                                <p class="text-sm text-red-600 mt-2">Silakan upload ulang bukti pembayaran yang benar.</p>
+                            </div>
+                        @endif
+
+                        <form method="POST" action="{{ route('bookings.upload-dp', $booking->id) }}" enctype="multipart/form-data" class="bg-white rounded-lg p-6">
+                            @csrf
+                            <label class="block mb-4">
+                                <span class="text-gray-700 font-semibold">Upload Bukti Transfer</span>
+                                <input type="file" name="dp_payment_proof" accept="image/*" required
+                                       class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100">
+                                @error('dp_payment_proof')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </label>
+                            <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition">
+                                📤 Upload Bukti Pembayaran
+                            </button>
+                        </form>
+                    @endif
+
+                    <!-- Pending Verification -->
+                    @if($booking->dp_status === 'pending')
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <p class="font-semibold text-yellow-800 mb-2">⏳ Bukti Pembayaran Sedang Diverifikasi</p>
+                            <p class="text-sm text-yellow-700">Bukti transfer Anda telah diupload pada {{ $booking->dp_paid_at->format('d M Y H:i') }}. Admin sedang memverifikasi pembayaran Anda.</p>
+                            @if($booking->dp_payment_proof)
+                                <div class="mt-3">
+                                    <p class="text-sm text-yellow-700 mb-2">Bukti yang diupload:</p>
+                                    <img src="{{ asset('storage/' . $booking->dp_payment_proof) }}" alt="Bukti DP" class="max-w-xs rounded border">
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Verified -->
+                    @if($booking->dp_status === 'verified')
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <p class="font-semibold text-green-800 mb-2">✅ Pembayaran DP Terverifikasi</p>
+                            <p class="text-sm text-green-700">Pembayaran DP Anda telah diverifikasi pada {{ $booking->dp_verified_at->format('d M Y H:i') }}. Booking Anda sudah terkonfirmasi!</p>
+                            <p class="text-sm text-green-600 mt-2">💰 Sisa pembayaran <strong>{{ $booking->remaining_payment }}</strong> dibayar saat Anda datang ke salon.</p>
+                        </div>
+                    @endif
+                </div>
+
                 <!-- Actions -->
                 <div class="flex justify-between items-center pt-6 border-t border-gray-200">
                     <a href="{{ route('bookings.history') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition duration-200">
                         Kembali
                     </a>
 
-                    @if($booking->status === 'pending')
+                    @if($booking->status === 'pending' && $booking->dp_status === 'unpaid')
                         <form method="POST" action="{{ route('bookings.cancel', $booking->id) }}">
                             @csrf
                             <button type="submit" onclick="return confirm('Yakin ingin membatalkan booking ini?')" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">

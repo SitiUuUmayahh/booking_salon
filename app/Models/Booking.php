@@ -18,11 +18,19 @@ class Booking extends Model
         'booking_time',
         'notes',
         'status',
+        'dp_amount',
+        'dp_status',
+        'dp_payment_proof',
+        'dp_rejection_reason',
+        'dp_paid_at',
+        'dp_verified_at',
     ];
 
     protected $casts = [
         'booking_date' => 'date',
         'booking_time' => 'datetime',
+        'dp_paid_at' => 'datetime',
+        'dp_verified_at' => 'datetime',
     ];
 
     public function user()
@@ -56,5 +64,28 @@ class Booking extends Model
             'cancelled' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>',
         ];
         return $badges[$this->status] ?? $this->status;
+    }
+
+    public function getDpStatusBadgeAttribute()
+    {
+        $badges = [
+            'unpaid' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Belum Bayar DP</span>',
+            'pending' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">⏳ Menunggu Verifikasi</span>',
+            'verified' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">✓ DP Terverifikasi</span>',
+            'rejected' => '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">✗ DP Ditolak</span>',
+        ];
+        return $badges[$this->dp_status] ?? $this->dp_status;
+    }
+
+    public function getFormattedDpAmountAttribute()
+    {
+        return 'Rp ' . number_format($this->dp_amount, 0, ',', '.');
+    }
+
+    public function getRemainingPaymentAttribute()
+    {
+        $totalPrice = $this->service->price ?? 0;
+        $remaining = $totalPrice - $this->dp_amount;
+        return 'Rp ' . number_format($remaining, 0, ',', '.');
     }
 }

@@ -29,8 +29,11 @@
                                         <h3 class="text-xl font-bold text-gray-800">{{ $booking->service->name }}</h3>
                                         <p class="text-gray-600">{{ $booking->customer_name }}</p>
                                     </div>
-                                    <div>
+                                    <div class="text-right">
                                         {!! $booking->status_badge !!}
+                                        <div class="mt-1">
+                                            {!! $booking->dp_status_badge !!}
+                                        </div>
                                     </div>
                                 </div>
 

@@ -88,6 +88,13 @@ class AdminBookingController extends Controller
             ]);
         }
 
+        // 🔒 ANTI-SPAM: DP harus sudah verified sebelum bisa confirm
+        if ($booking->dp_status !== 'verified') {
+            return back()->withErrors([
+                'error' => 'Pembayaran DP harus diverifikasi terlebih dahulu sebelum mengkonfirmasi booking'
+            ]);
+        }
+
         // Update status ke confirmed
         $booking->update(['status' => 'confirmed']);
 
@@ -159,4 +166,57 @@ class AdminBookingController extends Controller
         return redirect()->route('admin.bookings.index')
             ->with('success', 'Booking berhasil dihapus');
     }
-}
+
+    /**
+     * Verifikasi pembayaran DP
+     * 
+     * Route: POST /admin/bookings/{id}/verify-dp
+     */
+    public function verifyDp($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Validasi: Hanya bisa verify jika status pending
+        if ($booking->dp_status !== 'pending') {
+            return back()->withErrors([
+                'error' => 'Hanya DP dengan status Pending yang bisa diverifikasi'
+            ]);
+        }
+
+        $booking->update([
+            'dp_status' => 'verified',
+            'dp_verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Pembayaran DP berhasil diverifikasi!');
+    }
+
+    /**
+     * Tolak pembayaran DP
+     * 
+     * Route: POST /admin/bookings/{id}/reject-dp
+     */
+    public function rejectDp(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Validasi: Hanya bisa reject jika status pending
+        if ($booking->dp_status !== 'pending') {
+            return back()->withErrors([
+                'error' => 'Hanya DP dengan status Pending yang bisa ditolak'
+            ]);
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => ['required', 'string', 'max:500'],
+        ], [
+            'rejection_reason.required' => 'Alasan penolakan harus diisi',
+        ]);
+
+        $booking->update([
+            'dp_status' => 'rejected',
+            'dp_rejection_reason' => $validated['rejection_reason'],
+        ]);
+
+        return back()->with('success', 'Pembayaran DP ditolak. Customer akan diminta upload ulang.');
+    }}

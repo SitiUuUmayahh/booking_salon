@@ -97,6 +97,10 @@ class BookingController extends Controller
             ])->withInput();
         }
 
+        // Hitung DP (50% dari harga service)
+        $service = Service::findOrFail($validated['service_id']);
+        $dpAmount = $service->price * 0.5; // 50% DP
+
         $booking = Booking::create([
             'user_id' => Auth::id(),  // ID user yang sedang login
             'service_id' => $validated['service_id'],
@@ -105,13 +109,15 @@ class BookingController extends Controller
             'booking_time' => $validated['booking_time'],
             'notes' => $validated['notes'],
             'status' => 'pending',  // Status awal selalu pending
+            'dp_amount' => $dpAmount,
+            'dp_status' => 'unpaid', // Belum bayar DP
         ]);
 
         // Update last_booking_at untuk cooldown tracking
         $user->update(['last_booking_at' => now()]);
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Booking berhasil dibuat! Kami akan menghubungi Anda untuk konfirmasi.');
+        return redirect()->route('bookings.show', $booking->id)
+            ->with('success', 'Booking berhasil dibuat! Silakan upload bukti pembayaran DP untuk melanjutkan.');
     }
 
     public function history()
@@ -182,6 +188,48 @@ class BookingController extends Controller
 
         return redirect()->route('bookings.history')
             ->with('success', 'Booking berhasil dibatalkan');
+    }
+
+    /**
+     * Upload bukti pembayaran DP
+     */
+    public function uploadDpProof(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        // Security: Cek ownership
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Validasi: Hanya bisa upload jika status unpaid atau rejected
+        if (!in_array($booking->dp_status, ['unpaid', 'rejected'])) {
+            return back()->withErrors([
+                'error' => 'Bukti DP sudah pernah diupload dan sedang diproses.'
+            ]);
+        }
+
+        $validated = $request->validate([
+            'dp_payment_proof' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+        ], [
+            'dp_payment_proof.required' => 'Foto bukti transfer harus diupload',
+            'dp_payment_proof.image' => 'File harus berupa gambar',
+            'dp_payment_proof.mimes' => 'Format gambar harus jpeg, jpg, atau png',
+            'dp_payment_proof.max' => 'Ukuran gambar maksimal 2MB',
+        ]);
+
+        // Upload file ke storage/app/public/dp_proofs
+        $path = $request->file('dp_payment_proof')->store('dp_proofs', 'public');
+
+        // Update booking
+        $booking->update([
+            'dp_payment_proof' => $path,
+            'dp_status' => 'pending',
+            'dp_paid_at' => now(),
+            'dp_rejection_reason' => null, // Reset rejection reason
+        ]);
+
+        return back()->with('success', 'Bukti pembayaran DP berhasil diupload. Menunggu verifikasi admin.');
     }
 
 }
