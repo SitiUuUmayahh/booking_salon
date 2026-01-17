@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Service;
+use App\Services\WhatsAppService;
 use Carbon\Carbon;
 
 class Booking extends Model
@@ -87,5 +88,37 @@ class Booking extends Model
         $totalPrice = $this->service->price ?? 0;
         $remaining = $totalPrice - $this->dp_amount;
         return 'Rp ' . number_format($remaining, 0, ',', '.');
+    }
+
+    /**
+     * Generate WhatsApp link untuk admin
+     */
+    public function getWhatsAppAdminLinkAttribute()
+    {
+        return WhatsAppService::generateShareLink($this, 'admin');
+    }
+
+    /**
+     * Generate WhatsApp link untuk customer
+     */
+    public function getWhatsAppCustomerLinkAttribute()
+    {
+        return WhatsAppService::generateShareLink($this, 'customer');
+    }
+
+    /**
+     * Generate WhatsApp message untuk admin
+     */
+    public function getWhatsAppAdminMessageAttribute()
+    {
+        return WhatsAppService::generateAdminMessage($this);
+    }
+
+    /**
+     * Generate WhatsApp message untuk customer
+     */
+    public function getWhatsAppCustomerMessageAttribute()
+    {
+        return WhatsAppService::generateCustomerMessage($this);
     }
 }
