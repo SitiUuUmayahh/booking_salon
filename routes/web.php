@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\Admin\AdminServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +44,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::get('/customers/{id}', [AdminController::class, 'customerDetail'])->name('customers.detail');
+
+    // Services Management
     Route::get('/services', [AdminController::class, 'services'])->name('services');
+    Route::get('/services/create', [AdminServiceController::class, 'create'])->name('services.create');
+    Route::post('/services', [AdminServiceController::class, 'store'])->name('services.store');
+    Route::get('/services/{id}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
+    Route::put('/services/{id}', [AdminServiceController::class, 'update'])->name('services.update');
+    Route::delete('/services/{id}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
+
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/confirm', [AdminBookingController::class, 'confirm'])->name('bookings.confirm');

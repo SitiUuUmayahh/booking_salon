@@ -17,22 +17,28 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($services as $service)
                     <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-                        <!-- Service Image Placeholder -->
-                        <div class="h-48 bg-gradient-to-br from-pink-400 to-purple-500 rounded-t-lg flex items-center justify-center">
-                            <span class="text-white text-6xl">💇</span>
+                        <!-- Service Image -->
+                        <div class="h-48 bg-gradient-to-br from-pink-400 to-purple-500 rounded-t-lg flex items-center justify-center overflow-hidden">
+                            @if($service->image)
+                                <img src="{{ asset('storage/' . $service->image) }}"
+                                     alt="{{ $service->name }}"
+                                     class="w-full h-full object-cover">
+                            @else
+                                <span class="text-white text-6xl">💇</span>
+                            @endif
                         </div>
 
                         <!-- Service Details -->
                         <div class="p-6">
                             <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $service->name }}</h3>
                             <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $service->description }}</p>
-                            
+
                             <div class="flex justify-between items-center mb-4">
                                 <span class="text-2xl font-bold text-pink-600">{{ $service->formatted_price }}</span>
                                 <span class="text-sm text-gray-500">⏱️ {{ $service->formatted_duration }}</span>
                             </div>
 
-                            <button 
+                            <button
                                 type="button"
                                 data-booking-btn
                                 data-service-id="{{ $service->id }}"
@@ -97,12 +103,12 @@
                                         <div class="bg-pink-100 rounded-lg p-3 h-fit">
                                             <span class="text-2xl">💇</span>
                                         </div>
-                                        
+
                                         <!-- Booking Details -->
                                         <div class="flex-1">
                                             <h3 class="text-lg font-semibold text-gray-900">{{ $booking->service->name }}</h3>
                                             <p class="text-sm text-gray-600 mt-1">
-                                                📅 {{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }} 
+                                                📅 {{ \Carbon\Carbon::parse($booking->booking_date)->format('d M Y') }}
                                                 at {{ date('H:i', strtotime($booking->booking_time)) }}
                                             </p>
                                             <p class="text-sm text-gray-500 mt-1">
