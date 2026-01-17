@@ -1,3 +1,5 @@
+@extends('layouts.admin')
+
 @section('title', 'Detail Booking - Admin')
 @section('page-title', 'Detail Booking #' . $booking->id)
 
