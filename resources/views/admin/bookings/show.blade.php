@@ -44,7 +44,10 @@
 
         <!-- Customer Info -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Pelanggan</h3>
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center justify-between">
+                <span>Informasi Pelanggan</span>
+                {!! $booking->user->reputation_badge !!}
+            </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <p class="text-sm text-gray-600">Nama</p>
@@ -62,7 +65,22 @@
                     <p class="text-sm text-gray-600">Terdaftar Sejak</p>
                     <p class="text-lg font-semibold text-gray-800">{{ $booking->user->created_at->format('d M Y') }}</p>
                 </div>
+                <div>
+                    <p class="text-sm text-gray-600">Total Booking</p>
+                    <p class="text-lg font-semibold text-gray-800">{{ $booking->user->bookings()->count() }}x</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Dibatalkan</p>
+                    <p class="text-lg font-semibold text-red-600">{{ $booking->user->cancel_count }}x</p>
+                </div>
             </div>
+
+            @if($booking->user->is_suspended)
+                <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm font-semibold text-red-800 mb-1">⛔ User Di-Suspend</p>
+                    <p class="text-xs text-red-700">{{ $booking->user->suspend_reason }}</p>
+                </div>
+            @endif
         </div>
 
         <!-- Notes -->
@@ -141,6 +159,32 @@
                 @endif
             </div>
         </div>
+
+        <!-- User Management (Admin Only) -->
+        @if($booking->user->cancel_count > 0 || $booking->user->is_suspended)
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Kelola User</h3>
+                <div class="space-y-3">
+                    @if($booking->user->is_suspended)
+                        <form method="POST" action="{{ route('admin.users.unsuspend', $booking->user->id) }}">
+                            @csrf
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
+                                🔓 Aktifkan Kembali User
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($booking->user->cancel_count > 0)
+                        <form method="POST" action="{{ route('admin.users.reset-cancel-count', $booking->user->id) }}">
+                            @csrf
+                            <button type="submit" onclick="return confirm('Reset cancel count user ini?')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition">
+                                🔄 Reset Cancel Count
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

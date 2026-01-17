@@ -21,6 +21,10 @@ class User extends Authenticatable
         'password',
         'phone',    // TAMBAHAN
         'role',     // TAMBAHAN
+        'cancel_count',
+        'last_booking_at',
+        'is_suspended',
+        'suspend_reason',
     ];
 
     /**
@@ -37,6 +41,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_booking_at' => 'datetime',
+        'is_suspended' => 'boolean',
     ];
 
     /**
@@ -61,5 +67,25 @@ class User extends Authenticatable
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Helper: Get user reputation badge
+     */
+    public function getReputationBadgeAttribute()
+    {
+        if ($this->is_suspended) {
+            return '<span class="px-2 py-1 text-xs font-semibold rounded bg-red-100 text-red-800">⛔ Suspended</span>';
+        }
+
+        if ($this->cancel_count >= 3) {
+            return '<span class="px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-800">⚠️ Warning</span>';
+        }
+
+        if ($this->cancel_count >= 1) {
+            return '<span class="px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">⚡ ' . $this->cancel_count . 'x Cancel</span>';
+        }
+
+        return '<span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">✓ Baik</span>';
     }
 }

@@ -119,4 +119,31 @@ class AdminController extends Controller
 
         return view('admin.services', compact('services'));
     }
+
+    /**
+     * Unsuspend user yang di-suspend
+     */
+    public function unsuspendUser($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'is_suspended' => false,
+            'suspend_reason' => null,
+        ]);
+
+        return back()->with('success', 'User berhasil di-aktifkan kembali.');
+    }
+
+    /**
+     * Reset cancel count user
+     */
+    public function resetCancelCount($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update(['cancel_count' => 0]);
+
+        return back()->with('success', 'Cancel count berhasil direset.');
+    }
 }

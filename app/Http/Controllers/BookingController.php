@@ -20,13 +20,45 @@ class BookingController extends Controller
         if ($request->has('service_id')) {
             $service = Service::findOrFail($request->get('service_id'));
         }
-        
+
         $services = Service::all();
         return view('bookings.create', compact('service', 'services'));
     }
 
     public function store(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // 🔒 ANTI-SPAM 1: Cek apakah user di-suspend
+        if ($user->is_suspended) {
+            return back()->withErrors([
+                'error' => 'Akun Anda di-suspend karena: ' . $user->suspend_reason
+            ])->withInput();
+        }
+
+        // 🔒 ANTI-SPAM 2: Cooldown Period (30 menit)
+        if ($user->last_booking_at) {
+            $minutesSinceLastBooking = Carbon::parse($user->last_booking_at)->diffInMinutes(now());
+            if ($minutesSinceLastBooking < 30) {
+                $remainingMinutes = 30 - $minutesSinceLastBooking;
+                return back()->withErrors([
+                    'error' => "Mohon tunggu {$remainingMinutes} menit lagi sebelum membuat booking baru."
+                ])->withInput();
+            }
+        }
+
+        // 🔒 ANTI-SPAM 3: Batasan booking aktif (max 5 booking pending/confirmed)
+        $activeBookingsCount = Booking::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->count();
+
+        if ($activeBookingsCount >= 5) {
+            return back()->withErrors([
+                'error' => 'Anda sudah memiliki 5 booking aktif. Silakan selesaikan atau batalkan booking lama terlebih dahulu.'
+            ])->withInput();
+        }
+
         $validated = $request->validate([
             'service_id' => ['required', 'exists:services,id'],
             'customer_name' => ['required', 'string', 'max:255'],
@@ -74,6 +106,10 @@ class BookingController extends Controller
             'notes' => $validated['notes'],
             'status' => 'pending',  // Status awal selalu pending
         ]);
+
+        // Update last_booking_at untuk cooldown tracking
+        $user->update(['last_booking_at' => now()]);
+
         return redirect()->route('dashboard')
             ->with('success', 'Booking berhasil dibuat! Kami akan menghubungi Anda untuk konfirmasi.');
     }
@@ -81,7 +117,9 @@ class BookingController extends Controller
     public function history()
     {
         // Ambil booking milik user yang login, dengan relasi service
-        $bookings = Auth::user()
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $bookings = $user
             ->bookings()
             ->with('service')  // Eager loading untuk avoid N+1 query
             ->orderBy('created_at', 'desc')
@@ -116,7 +154,31 @@ class BookingController extends Controller
                 'error' => 'Booking ini tidak dapat dibatalkan.'
             ]);
         }
+
         $booking->update(['status' => 'cancelled']);
+
+        // 🔒 ANTI-SPAM: Track cancel count
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->increment('cancel_count');
+
+        // Auto-suspend jika cancel lebih dari 5 kali
+        if ($user->cancel_count >= 5) {
+            $user->update([
+                'is_suspended' => true,
+                'suspend_reason' => 'Terlalu sering membatalkan booking (lebih dari 5 kali). Hubungi admin untuk mengaktifkan kembali akun Anda.'
+            ]);
+
+            return redirect()->route('bookings.history')
+                ->with('warning', 'Booking dibatalkan. PERINGATAN: Akun Anda telah di-suspend karena terlalu sering membatalkan booking. Silakan hubungi admin.');
+        }
+
+        // Warning jika cancel 3-4 kali
+        if ($user->cancel_count >= 3) {
+            $remaining = 5 - $user->cancel_count;
+            return redirect()->route('bookings.history')
+                ->with('warning', "Booking dibatalkan. PERINGATAN: Anda telah membatalkan {$user->cancel_count}x. Jika membatalkan {$remaining}x lagi, akun akan di-suspend.");
+        }
 
         return redirect()->route('bookings.history')
             ->with('success', 'Booking berhasil dibatalkan');
