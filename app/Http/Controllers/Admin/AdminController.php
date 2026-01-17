@@ -13,7 +13,7 @@ class AdminController extends Controller
 {
     /**
      * Menampilkan dashboard admin
-     * 
+     *
      * Route: GET /admin/dashboard
      * View: admin/dashboard.blade.php (Anggota 5 yang buat)
      */
@@ -24,7 +24,7 @@ class AdminController extends Controller
         $pendingBookings = Booking::where('status', 'pending')->count();
         $confirmedBookings = Booking::where('status', 'confirmed')->count();
         $cancelledBookings = Booking::where('status', 'cancelled')->count();
-        
+
         // Booking terbaru (10 terakhir)
         $recentBookings = Booking::with(['user', 'service'])
             ->orderBy('created_at', 'desc')
@@ -56,7 +56,7 @@ class AdminController extends Controller
 
     /**
      * Menampilkan daftar semua customers
-     * 
+     *
      * Route: GET /admin/customers
      * View: admin/customers.blade.php (Anggota 5 yang buat)
      */
@@ -73,7 +73,7 @@ class AdminController extends Controller
 
     /**
      * Menampilkan detail customer
-     * 
+     *
      * Route: GET /admin/customers/{id}
      * View: admin/customers-detail.blade.php (Anggota 5 yang buat)
      */
@@ -106,7 +106,7 @@ class AdminController extends Controller
 
     /**
      * Menampilkan daftar semua services
-     * 
+     *
      * Route: GET /admin/services
      * View: admin/services.blade.php (Anggota 5 yang buat)
      */
