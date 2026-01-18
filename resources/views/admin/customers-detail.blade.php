@@ -18,12 +18,12 @@
 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
     <div class="flex items-center mb-6">
         <div class="w-20 h-20 rounded-full bg-pink-600 flex items-center justify-center text-white text-3xl font-bold">
-            {{ substr($customer->name, 0, 1) }}
+            {{ $customer && $customer->name ? substr($customer->name, 0, 1) : '?' }}
         </div>
         <div class="ml-6">
-            <h2 class="text-2xl font-bold text-gray-800">{{ $customer->name }}</h2>
-            <p class="text-gray-600">{{ $customer->email }}</p>
-            <p class="text-gray-600">{{ $customer->phone }}</p>
+            <h2 class="text-2xl font-bold text-gray-800">{{ $customer->name ?? 'Nama tidak tersedia' }}</h2>
+            <p class="text-gray-600">{{ $customer->email ?? 'Email tidak tersedia' }}</p>
+            <p class="text-gray-600">{{ $customer->phone ?? 'Telepon tidak tersedia' }}</p>
         </div>
     </div>
 
@@ -31,19 +31,19 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-blue-50 rounded-lg p-4">
             <p class="text-sm text-gray-600">Total Booking</p>
-            <p class="text-2xl font-bold text-blue-600">{{ $customer_stats['total_bookings'] }}</p>
+            <p class="text-2xl font-bold text-blue-600">{{ $customer_stats['total_bookings'] ?? 0 }}</p>
         </div>
         <div class="bg-green-50 rounded-lg p-4">
             <p class="text-sm text-gray-600">Completed</p>
-            <p class="text-2xl font-bold text-green-600">{{ $customer_stats['completed_bookings'] }}</p>
+            <p class="text-2xl font-bold text-green-600">{{ $customer_stats['completed_bookings'] ?? 0 }}</p>
         </div>
         <div class="bg-red-50 rounded-lg p-4">
             <p class="text-sm text-gray-600">Cancelled</p>
-            <p class="text-2xl font-bold text-red-600">{{ $customer_stats['cancelled_bookings'] }}</p>
+            <p class="text-2xl font-bold text-red-600">{{ $customer_stats['cancelled_bookings'] ?? 0 }}</p>
         </div>
         <div class="bg-purple-50 rounded-lg p-4">
             <p class="text-sm text-gray-600">Total Spent</p>
-            <p class="text-2xl font-bold text-purple-600">Rp {{ number_format($customer_stats['total_spent'], 0, ',', '.') }}</p>
+            <p class="text-2xl font-bold text-purple-600">Rp {{ number_format($customer_stats['total_spent'] ?? 0, 0, ',', '.') }}</p>
         </div>
     </div>
 </div>
@@ -57,13 +57,17 @@
             <div class="border border-gray-200 rounded-lg p-4 hover:border-pink-300 transition">
                 <div class="flex justify-between items-start mb-2">
                     <div>
-                        <p class="font-semibold text-gray-800">{{ $booking->service->name }}</p>
+                        <p class="font-semibold text-gray-800">
+                            {{ $booking->service ? $booking->service->name : 'Service tidak ditemukan' }}
+                        </p>
                         <p class="text-sm text-gray-600">{{ $booking->formatted_date }} - {{ $booking->formatted_time }}</p>
                     </div>
                     {!! $booking->status_badge !!}
                 </div>
                 <div class="flex justify-between items-center mt-3">
-                    <p class="text-sm font-semibold text-pink-600">{{ $booking->service->formatted_price }}</p>
+                    <p class="text-sm font-semibold text-pink-600">
+                        {{ $booking->service ? $booking->service->formatted_price : 'Harga tidak tersedia' }}
+                    </p>
                     <a href="{{ route('admin.bookings.show', $booking->id) }}" class="text-sm text-pink-600 hover:text-pink-700">
                         Detail →
                     </a>

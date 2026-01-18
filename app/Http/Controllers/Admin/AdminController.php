@@ -84,9 +84,9 @@ class AdminController extends Controller
             ->where('id', $id)
             ->firstOrFail();
 
-        // Ambil riwayat booking customer
+        // Ambil riwayat booking customer dengan eager loading service
         $bookings = $customer->bookings()
-            ->with('service')
+            ->with(['service'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
