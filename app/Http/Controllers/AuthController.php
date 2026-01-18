@@ -40,13 +40,24 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
             
+            // DEBUG: Log user info untuk debugging
+            $user = Auth::user();
+            \Log::info('User login:', [
+                'id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+                'name' => $user->name
+            ]);
+            
             // CEK ROLE: Redirect berdasarkan role user
-            if (Auth::user()->role === 'admin') {
+            if ($user->role === 'admin') {
+                \Log::info('Redirecting to admin dashboard for user: ' . $user->email);
                 // jika admin, redirect ke admin dashboard
                 return redirect()->intended(route('admin.dashboard'))
                     ->with('success', 'Selamat datang Admin!');
             }
             
+            \Log::info('Redirecting to user dashboard for user: ' . $user->email);
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Login berhasil!');
         }
