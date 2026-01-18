@@ -30,6 +30,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Route debug sementara
+Route::get('/debug-users', function () {
+    return view('debug-users');
+});
+
 Route::redirect('/home', '/dashboard');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');

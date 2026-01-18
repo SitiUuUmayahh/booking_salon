@@ -14,32 +14,38 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Buat Admin User
-        User::create([
-            'name' => 'Admin Dsisi Salon',
-            'email' => 'admin@dsisisalon.com',
-            'password' => Hash::make('admin123'),
-            'phone' => '081234567890',
-            'role' => 'admin'
-        ]);
+        // Buat Admin User (atau update jika sudah ada)
+        User::updateOrCreate(
+            ['email' => 'admin@dsisisalon.com'], // kondisi pencarian
+            [
+                'name' => 'Admin Dsisi Salon',
+                'password' => Hash::make('admin123'),
+                'phone' => '081234567890',
+                'role' => 'admin'
+            ]
+        );
 
-        // Buat User Biasa untuk Testing
-        User::create([
-            'name' => 'Siti Nurhaliza',
-            'email' => 'siti@gmail.com',
-            'password' => Hash::make('password123'),
-            'phone' => '081234567891',
-            'role' => 'user'
-        ]);
+        // Buat User Biasa untuk Testing (atau update jika sudah ada)
+        User::updateOrCreate(
+            ['email' => 'siti@gmail.com'],
+            [
+                'name' => 'Siti Nurhaliza',
+                'password' => Hash::make('password123'),
+                'phone' => '081234567891',
+                'role' => 'user'
+            ]
+        );
 
-        User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'budi@gmail.com',
-            'password' => Hash::make('password123'),
-            'phone' => '081234567892',
-            'role' => 'user'
-        ]);
+        User::updateOrCreate(
+            ['email' => 'budi@gmail.com'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => Hash::make('password123'),
+                'phone' => '081234567892',
+                'role' => 'user'
+            ]
+        );
 
-        echo "✅ Admin dan test users berhasil dibuat!\n";
+        echo "✅ Admin dan test users berhasil dibuat/diupdate!\n";
     }
 }
