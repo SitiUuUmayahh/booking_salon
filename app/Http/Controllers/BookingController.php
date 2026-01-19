@@ -85,20 +85,18 @@ class BookingController extends Controller
             ])->withInput();
         }
 
-        $bookingDate = Carbon::parse($validated['booking_date']);
-        $existingBookings = Booking::where('booking_date', $bookingDate)
-            ->where('booking_time', $validated['booking_time'])
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->count();
-
-        if ($existingBookings >= 3) {
-            return back()->withErrors([
-                'booking_time' => 'Maaf, slot waktu ini sudah penuh. Silakan pilih waktu lain.'
-            ])->withInput();
-        }
-
         // Hitung DP (50% dari harga service)
         $service = Service::findOrFail($validated['service_id']);
+        
+        // Cek ketersediaan slot berdasarkan max_bookings dari service
+        $bookingDate = Carbon::parse($validated['booking_date']);
+        $slotInfo = $service->getAvailableSlots($bookingDate->format('Y-m-d'), $validated['booking_time']);
+
+        if ($slotInfo['is_full']) {
+            return back()->withErrors([
+                'booking_time' => "Maaf, slot waktu ini sudah penuh ({$slotInfo['booked']}/{$slotInfo['total']} terisi). Silakan pilih waktu lain."
+            ])->withInput();
+        }
         $dpAmount = $service->price * 0.5; // 50% DP
 
         $booking = Booking::create([
@@ -230,6 +228,29 @@ class BookingController extends Controller
         ]);
 
         return back()->with('success', 'Bukti pembayaran DP berhasil diupload. Menunggu verifikasi admin.');
+    }
+
+    /**
+     * API: Cek slot tersedia untuk service, tanggal, dan waktu tertentu
+     */
+    public function checkAvailability(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'booking_date' => 'required|date',
+            'booking_time' => 'required|date_format:H:i',
+        ]);
+
+        $service = Service::findOrFail($request->service_id);
+        $slotInfo = $service->getAvailableSlots($request->booking_date, $request->booking_time);
+
+        return response()->json([
+            'success' => true,
+            'data' => $slotInfo,
+            'message' => $slotInfo['is_full'] 
+                ? "Slot penuh ({$slotInfo['booked']}/{$slotInfo['total']})" 
+                : "{$slotInfo['available']} slot tersedia dari {$slotInfo['total']}"
+        ]);
     }
 
 }
