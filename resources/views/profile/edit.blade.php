@@ -27,8 +27,8 @@
                         <label for="name" class="block text-gray-700 font-semibold mb-2">
                             Nama Lengkap <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="name" id="name" 
-                               value="{{ old('name', $user->name) }}" 
+                        <input type="text" name="name" id="name"
+                               value="{{ old('name', $user->name) }}"
                                required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                         @error('name')
@@ -41,8 +41,8 @@
                         <label for="email" class="block text-gray-700 font-semibold mb-2">
                             Email <span class="text-red-500">*</span>
                         </label>
-                        <input type="email" name="email" id="email" 
-                               value="{{ old('email', $user->email) }}" 
+                        <input type="email" name="email" id="email"
+                               value="{{ old('email', $user->email) }}"
                                required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                         @error('email')
@@ -55,8 +55,8 @@
                         <label for="phone" class="block text-gray-700 font-semibold mb-2">
                             Nomor Telepon
                         </label>
-                        <input type="text" name="phone" id="phone" 
-                               value="{{ old('phone', $user->phone) }}" 
+                        <input type="text" name="phone" id="phone"
+                               value="{{ old('phone', $user->phone) }}"
                                placeholder="08xxxxxxxxxx"
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                         @error('phone')
@@ -65,7 +65,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                             class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
                         💾 Simpan Perubahan
                     </button>
@@ -85,7 +85,7 @@
                         <label for="current_password" class="block text-gray-700 font-semibold mb-2">
                             Password Saat Ini <span class="text-red-500">*</span>
                         </label>
-                        <input type="password" name="current_password" id="current_password" 
+                        <input type="password" name="current_password" id="current_password"
                                required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                         @error('current_password')
@@ -98,7 +98,7 @@
                         <label for="password" class="block text-gray-700 font-semibold mb-2">
                             Password Baru <span class="text-red-500">*</span>
                         </label>
-                        <input type="password" name="password" id="password" 
+                        <input type="password" name="password" id="password"
                                required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                         <p class="text-sm text-gray-500 mt-1">Minimal 8 karakter</p>
@@ -112,7 +112,7 @@
                         <label for="password_confirmation" class="block text-gray-700 font-semibold mb-2">
                             Konfirmasi Password Baru <span class="text-red-500">*</span>
                         </label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" 
+                        <input type="password" name="password_confirmation" id="password_confirmation"
                                required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                     </div>
@@ -130,7 +130,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                             class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
                         🔐 Ubah Password
                     </button>

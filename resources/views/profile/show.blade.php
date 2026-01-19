@@ -15,7 +15,7 @@
         <!-- Profile Card -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div class="bg-gradient-to-r from-pink-500 to-purple-600 h-24"></div>
-            
+
             <div class="px-6 pb-6">
                 <!-- Avatar -->
                 <div class="flex items-center -mt-12 mb-4">
@@ -40,7 +40,7 @@
                         @endif
                         <span class="text-sm text-gray-500">Member sejak {{ $user->created_at->format('d M Y') }}</span>
                     </div>
-                    <a href="{{ route('profile.edit') }}" 
+                    <a href="{{ route('profile.edit') }}"
                        class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition">
                         Edit Profile
                     </a>
@@ -59,7 +59,7 @@
         <!-- Booking Statistics -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Statistik Booking</h3>
-            
+
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div class="text-center p-3 bg-gray-50 rounded-lg">
                     <p class="text-2xl font-bold text-purple-600">{{ $bookingStats['total'] }}</p>
@@ -95,7 +95,7 @@
             @if($user->cancel_count >= 3 && !$user->is_suspended)
                 <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
                     <p class="text-xs text-yellow-800">
-                        ⚠️ Anda telah membatalkan {{ $user->cancel_count }}x booking. 
+                        ⚠️ Anda telah membatalkan {{ $user->cancel_count }}x booking.
                         Jika membatalkan {{ 5 - $user->cancel_count }}x lagi, akun akan di-suspend.
                     </p>
                 </div>
@@ -104,7 +104,7 @@
 
         <!-- Quick Menu -->
         <div class="grid grid-cols-2 gap-4">
-            <a href="{{ route('dashboard') }}" 
+            <a href="{{ route('dashboard') }}"
                class="bg-white hover:bg-gray-50 p-4 rounded-lg shadow-md transition flex items-center">
                 <span class="text-2xl mr-3">🏠</span>
                 <div>
@@ -113,7 +113,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('services.index') }}" 
+            <a href="{{ route('services.index') }}"
                class="bg-white hover:bg-gray-50 p-4 rounded-lg shadow-md transition flex items-center">
                 <span class="text-2xl mr-3">💇</span>
                 <div>
@@ -122,7 +122,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('bookings.history') }}" 
+            <a href="{{ route('bookings.history') }}"
                class="bg-white hover:bg-gray-50 p-4 rounded-lg shadow-md transition flex items-center">
                 <span class="text-2xl mr-3">📜</span>
                 <div>
@@ -131,7 +131,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('profile.edit') }}" 
+            <a href="{{ route('profile.edit') }}"
                class="bg-white hover:bg-gray-50 p-4 rounded-lg shadow-md transition flex items-center">
                 <span class="text-2xl mr-3">✏️</span>
                 <div>
