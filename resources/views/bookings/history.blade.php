@@ -17,9 +17,15 @@
                 @foreach($bookings as $booking)
                     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                         <div class="md:flex">
-                            <!-- Left Side: Service Icon -->
+                            <!-- Left Side: Service Image -->
                             <div class="md:w-1/4 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center p-8">
-                                <span class="text-white text-6xl">💇</span>
+                                @if($booking->service->image)
+                                    <img src="{{ asset('storage/' . $booking->service->image) }}" 
+                                         alt="{{ $booking->service->name }}"
+                                         class="w-full h-full object-cover">
+                                @else
+                                    <span class="text-white text-6xl">💇</span>
+                                @endif
                             </div>
 
                             <!-- Right Side: Booking Details -->
