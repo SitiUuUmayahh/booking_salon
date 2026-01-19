@@ -21,6 +21,7 @@ class AdminServiceController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
+            'max_bookings' => 'required|integer|min:1|max:20',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ]);
 
@@ -48,6 +49,7 @@ class AdminServiceController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
+            'max_bookings' => 'required|integer|min:1|max:20',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ]);
 
