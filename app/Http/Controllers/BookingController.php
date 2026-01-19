@@ -142,7 +142,14 @@ class BookingController extends Controller
             abort(403, 'Anda tidak memiliki akses ke booking ini');
         }
 
-        return view('bookings.show', compact('booking'));
+        // Hitung slot availability untuk slot waktu booking ini
+        $bookingTime = Carbon::parse($booking->booking_time)->format('H:i');
+        $slotInfo = $booking->service->getAvailableSlots(
+            $booking->booking_date->format('Y-m-d'),
+            $bookingTime
+        );
+
+        return view('bookings.show', compact('booking', 'slotInfo'));
     }
 
     public function cancel($id)
