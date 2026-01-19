@@ -31,7 +31,7 @@
                         <label for="service_id" class="block text-gray-700 font-semibold mb-2">
                             Pilih Layanan <span class="text-red-500">*</span>
                         </label>
-                        <select name="service_id" id="service_id" required 
+                        <select name="service_id" id="service_id" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                 onchange="updateServiceInfo()">
                             <option value="">-- Pilih Layanan --</option>
@@ -65,7 +65,7 @@
                         <label for="customer_name" class="block text-gray-700 font-semibold mb-2">
                             Nama Lengkap <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="customer_name" id="customer_name" 
+                        <input type="text" name="customer_name" id="customer_name"
                                value="{{ Auth::user()->name }}" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                placeholder="Masukkan nama Anda">
@@ -79,7 +79,7 @@
                         <label for="booking_date" class="block text-gray-700 font-semibold mb-2">
                             Tanggal Booking <span class="text-red-500">*</span>
                         </label>
-                        <input type="date" name="booking_date" id="booking_date" 
+                        <input type="date" name="booking_date" id="booking_date"
                                min="{{ date('Y-m-d') }}" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                value="{{ old('booking_date') }}"
@@ -113,7 +113,7 @@
                             <option value="20:00" {{ old('booking_time') === '20:00' ? 'selected' : '' }}>20:00</option>
                         </select>
                         <p class="text-gray-500 text-sm mt-1">⏰ Jam operasional: 09:00 - 20:00</p>
-                        
+
                         <!-- Slot Availability Display -->
                         <div id="slotAvailability" class="hidden mt-3 p-4 rounded-lg border-2">
                             <div class="flex items-center justify-between">
@@ -151,7 +151,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         @error('booking_time')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                         @enderror
@@ -185,11 +185,11 @@
 
                     <!-- Action Buttons -->
                     <div class="flex gap-4 pt-6">
-                        <a href="{{ route('dashboard') }}" 
+                        <a href="{{ route('dashboard') }}"
                            class="flex-1 px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors duration-200 font-semibold text-center">
                             Batal
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-200 font-semibold">
                             Konfirmasi Booking
                         </button>
@@ -243,13 +243,13 @@ const servicesData = {
 function updateServiceInfo() {
     const serviceId = document.getElementById('service_id').value;
     const infoBox = document.getElementById('serviceInfo');
-    
+
     if (serviceId && servicesData[serviceId]) {
         const service = servicesData[serviceId];
         document.getElementById('servicePrice').textContent = service.price;
         document.getElementById('serviceDuration').textContent = service.duration;
         infoBox.classList.remove('hidden');
-        
+
         // Cek availability jika tanggal dan waktu sudah dipilih
         checkAvailability();
     } else {
@@ -263,13 +263,13 @@ async function checkAvailability() {
     const serviceId = document.getElementById('service_id').value;
     const bookingDate = document.getElementById('booking_date').value;
     const bookingTime = document.getElementById('booking_time').value;
-    
+
     // Reset display jika data belum lengkap
     if (!serviceId || !bookingDate || !bookingTime) {
         hideSlotAvailability();
         return;
     }
-    
+
     try {
         const response = await fetch('{{ route("api.bookings.check-availability") }}', {
             method: 'POST',
@@ -283,9 +283,9 @@ async function checkAvailability() {
                 booking_time: bookingTime
             })
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             showSlotAvailability(result.data);
         }
@@ -301,17 +301,17 @@ function showSlotAvailability(slotInfo) {
     const fullAlert = document.getElementById('slotFullAlert');
     const warningAlert = document.getElementById('slotWarningAlert');
     const submitButton = document.querySelector('button[type="submit"]');
-    
+
     slotCount.textContent = slotInfo.available;
     slotMessage.textContent = `${slotInfo.booked} dari ${slotInfo.total} slot terisi`;
-    
+
     // Reset classes
     slotBox.classList.remove('hidden', 'border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50', 'border-red-500', 'bg-red-50');
     slotCount.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
     slotMessage.classList.remove('text-green-700', 'text-yellow-700', 'text-red-700');
     fullAlert.classList.add('hidden');
     warningAlert.classList.add('hidden');
-    
+
     if (slotInfo.is_full) {
         // Slot penuh - merah dan disable submit
         slotBox.classList.add('border-red-500', 'bg-red-50');
@@ -326,7 +326,7 @@ function showSlotAvailability(slotInfo) {
         submitButton.disabled = false;
         submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
         submitButton.title = '';
-        
+
         if (slotInfo.available <= 2) {
             // Hampir penuh - kuning
             slotBox.classList.add('border-yellow-500', 'bg-yellow-50');
@@ -346,7 +346,7 @@ function hideSlotAvailability() {
     const slotBox = document.getElementById('slotAvailability');
     const submitButton = document.querySelector('button[type="submit"]');
     slotBox.classList.add('hidden');
-    
+
     // Re-enable submit button
     submitButton.disabled = false;
     submitButton.classList.remove('opacity-50', 'cursor-not-allowed');

@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/bookings/check-availability', function (Request $request) {
     $service = Service::findOrFail($request->service_id);
     $slotInfo = $service->getAvailableSlots($request->booking_date, $request->booking_time);
-    
+
     return response()->json([
         'success' => true,
         'data' => $slotInfo
