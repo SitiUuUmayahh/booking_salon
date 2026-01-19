@@ -15,6 +15,7 @@ class Service extends Model
         'price',
         'duration',
         'image',
+        'max_bookings',
     ];
 
     public function bookings()

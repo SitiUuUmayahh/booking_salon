@@ -7,21 +7,22 @@ use App\Models\Booking;
 class WhatsAppService
 {
     /**
-     * Format nomor WhatsApp ke format international
+     * Format nomor WhatsApp ke format international (tanpa +)
+     * Format untuk wa.me: hanya angka, tanpa + atau karakter lain
      */
     public static function formatNumber(string $number): string
     {
-        // Hapus spasi dan karakter khusus
-        $number = preg_replace('/[^0-9+]/', '', $number);
+        // Hapus semua karakter kecuali angka
+        $number = preg_replace('/[^0-9]/', '', $number);
         
         // Jika awalan 0, ganti dengan 62
         if (substr($number, 0, 1) === '0') {
             $number = '62' . substr($number, 1);
         }
         
-        // Jika belum ada +, tambahkan
-        if (substr($number, 0, 1) !== '+') {
-            $number = '+' . $number;
+        // Jika belum ada 62 di depan, tambahkan
+        if (substr($number, 0, 2) !== '62') {
+            $number = '62' . $number;
         }
         
         return $number;
@@ -109,7 +110,12 @@ class WhatsAppService
      */
     private static function generateLink(string $number, string $message): string
     {
+        // Pastikan hanya angka (sudah diformat di formatNumber)
+        $number = preg_replace('/[^0-9]/', '', $number);
+        
+        // Encode message untuk URL
         $encodedMessage = urlencode($message);
+        
         return "https://wa.me/{$number}?text={$encodedMessage}";
     }
 
