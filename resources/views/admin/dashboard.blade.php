@@ -1,17 +1,11 @@
 @extends('layouts.admin')
 
 @section('title', 'Admin Dashboard')
+@section('header', 'Admin Dashboard')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-gray-900">Ringkasan Admin</h1>
-        <div class="text-sm text-gray-500">Terakhir diperbarui: {{ now()->format('d M Y H:i') }}</div>
-    </div>
-
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Booking Card -->
             <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-pink-600">
                 <div class="flex justify-between items-start">
