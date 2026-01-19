@@ -18,13 +18,15 @@
                     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                         <div class="md:flex">
                             <!-- Left Side: Service Image -->
-                            <div class="md:w-1/4 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center p-8">
+                            <div class="md:w-1/4 bg-gradient-to-br from-pink-400 to-purple-500 relative overflow-hidden">
                                 @if($booking->service->image)
                                     <img src="{{ asset('storage/' . $booking->service->image) }}"
                                          alt="{{ $booking->service->name }}"
-                                         class="w-full h-full object-cover">
+                                         class="w-full h-full object-cover absolute inset-0">
                                 @else
-                                    <span class="text-white text-6xl">💇</span>
+                                    <div class="flex items-center justify-center h-full min-h-[200px]">
+                                        <span class="text-white text-6xl">💇</span>
+                                    </div>
                                 @endif
                             </div>
 
