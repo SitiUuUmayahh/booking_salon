@@ -117,13 +117,37 @@
                         <!-- Slot Availability Display -->
                         <div id="slotAvailability" class="hidden mt-3 p-4 rounded-lg border-2">
                             <div class="flex items-center justify-between">
-                                <div>
+                                <div class="flex-1">
                                     <p class="font-semibold text-gray-700">Status Slot:</p>
-                                    <p id="slotMessage" class="text-sm"></p>
+                                    <p id="slotMessage" class="text-sm mt-1"></p>
                                 </div>
-                                <div class="text-right">
+                                <div class="text-right ml-4">
                                     <p id="slotCount" class="text-3xl font-bold"></p>
                                     <p class="text-xs text-gray-500">slot tersisa</p>
+                                </div>
+                            </div>
+                            <!-- Pesan untuk slot penuh -->
+                            <div id="slotFullAlert" class="hidden mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-red-800">Slot waktu ini sudah penuh!</p>
+                                        <p class="text-xs text-red-700 mt-1">Silakan pilih waktu atau tanggal lain yang masih tersedia.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pesan untuk slot hampir penuh -->
+                            <div id="slotWarningAlert" class="hidden mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-yellow-800">Slot hampir penuh!</p>
+                                        <p class="text-xs text-yellow-700 mt-1">Segera booking sebelum slot habis.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -274,35 +298,59 @@ function showSlotAvailability(slotInfo) {
     const slotBox = document.getElementById('slotAvailability');
     const slotCount = document.getElementById('slotCount');
     const slotMessage = document.getElementById('slotMessage');
+    const fullAlert = document.getElementById('slotFullAlert');
+    const warningAlert = document.getElementById('slotWarningAlert');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     slotCount.textContent = slotInfo.available;
     slotMessage.textContent = `${slotInfo.booked} dari ${slotInfo.total} slot terisi`;
     
-    // Ubah warna berdasarkan ketersediaan
+    // Reset classes
     slotBox.classList.remove('hidden', 'border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50', 'border-red-500', 'bg-red-50');
     slotCount.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
+    slotMessage.classList.remove('text-green-700', 'text-yellow-700', 'text-red-700');
+    fullAlert.classList.add('hidden');
+    warningAlert.classList.add('hidden');
     
     if (slotInfo.is_full) {
-        // Slot penuh - merah
+        // Slot penuh - merah dan disable submit
         slotBox.classList.add('border-red-500', 'bg-red-50');
         slotCount.classList.add('text-red-600');
         slotMessage.classList.add('text-red-700');
-    } else if (slotInfo.available <= 2) {
-        // Hampir penuh - kuning
-        slotBox.classList.add('border-yellow-500', 'bg-yellow-50');
-        slotCount.classList.add('text-yellow-600');
-        slotMessage.classList.add('text-yellow-700');
+        fullAlert.classList.remove('hidden');
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+        submitButton.title = 'Slot penuh, pilih waktu lain';
     } else {
-        // Tersedia - hijau
-        slotBox.classList.add('border-green-500', 'bg-green-50');
-        slotCount.classList.add('text-green-600');
-        slotMessage.classList.add('text-green-700');
+        // Enable submit button
+        submitButton.disabled = false;
+        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitButton.title = '';
+        
+        if (slotInfo.available <= 2) {
+            // Hampir penuh - kuning
+            slotBox.classList.add('border-yellow-500', 'bg-yellow-50');
+            slotCount.classList.add('text-yellow-600');
+            slotMessage.classList.add('text-yellow-700');
+            warningAlert.classList.remove('hidden');
+        } else {
+            // Tersedia - hijau
+            slotBox.classList.add('border-green-500', 'bg-green-50');
+            slotCount.classList.add('text-green-600');
+            slotMessage.classList.add('text-green-700');
+        }
     }
 }
 
 function hideSlotAvailability() {
     const slotBox = document.getElementById('slotAvailability');
+    const submitButton = document.querySelector('button[type="submit"]');
     slotBox.classList.add('hidden');
+    
+    // Re-enable submit button
+    submitButton.disabled = false;
+    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    submitButton.title = '';
 }
 
 // Initialize on page load if service was selected
