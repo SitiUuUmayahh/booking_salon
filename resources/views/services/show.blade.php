@@ -55,6 +55,12 @@
                                 <p class="text-gray-600 text-sm font-medium mb-1">Durasi Layanan</p>
                                 <p class="text-2xl font-bold text-blue-600">{{ $service->formatted_duration }}</p>
                             </div>
+
+                            <!-- Max Bookings -->
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                                <p class="text-gray-600 text-sm font-medium mb-1">Kapasitas per Slot</p>
+                                <p class="text-2xl font-bold text-green-600">{{ $service->max_bookings }} orang</p>
+                            </div>
                         </div>
                     </div>
 
