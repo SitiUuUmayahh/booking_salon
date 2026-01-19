@@ -55,6 +55,17 @@
                 </div>
             </div>
 
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Maksimal Booking per Slot *</label>
+                <input type="number" name="max_bookings" value="{{ old('max_bookings', 5) }}" required min="1" max="20"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent @error('max_bookings') border-red-500 @enderror"
+                       placeholder="5">
+                <p class="text-gray-500 text-sm mt-1">Jumlah maksimal pelanggan yang bisa booking di waktu yang sama</p>
+                @error('max_bookings')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <div class="mb-6">
                 <label class="block text-gray-700 font-semibold mb-2">Foto Layanan</label>
                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-500 transition">
