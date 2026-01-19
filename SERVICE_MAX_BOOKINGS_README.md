@@ -1,7 +1,26 @@
 # Service Max Bookings - Dokumentasi
 
 ## Deskripsi
-Fitur ini mengatur maksimal jumlah booking yang dapat dilakukan untuk setiap layanan salon dalam satu slot waktu. Hal ini penting untuk memastikan kualitas layanan dan menghindari overbooking.
+Fitur ini mengatur maksimal jumlah booking yang dapat dilakukan untuk setiap layanan salon dalam satu slot waktu. Sistem akan **otomatis mengurangi slot tersedia** saat ada pelanggan yang booking dan menampilkan informasi real-time di halaman booking.
+
+## ✨ Fitur Utomatis
+
+### 1. **Validasi Slot Otomatis**
+- Sistem otomatis mengecek slot tersedia berdasarkan `max_bookings` dari masing-masing service
+- Mencegah overbooking dengan validasi di backend
+- Menampilkan pesan error jika slot sudah penuh
+
+### 2. **Real-time Slot Availability**
+- Pelanggan bisa melihat slot tersedia secara real-time
+- Tampilan berubah warna berdasarkan ketersediaan:
+  - 🟢 **Hijau**: Slot masih banyak (>2 slot)
+  - 🟡 **Kuning**: Hampir penuh (≤2 slot)
+  - 🔴 **Merah**: Slot penuh (0 slot)
+- Update otomatis saat memilih layanan, tanggal, atau jam
+
+### 3. **Informasi Transparan**
+- Menampilkan jumlah slot terisi dan tersisa
+- Contoh: "3 dari 6 slot terisi" dengan "3 slot tersisa"
 
 ## Konfigurasi Maksimal Booking per Layanan
 
