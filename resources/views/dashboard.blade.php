@@ -60,14 +60,10 @@
                                 <span class="text-sm text-gray-500">⏱️ {{ $service->formatted_duration }}</span>
                             </div>
 
-                            <button
-                                type="button"
-                                data-booking-btn
-                                data-service-id="{{ $service->id }}"
-                                data-service-name="{{ $service->name }}"
-                                class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                                Booking Sekarang
-                            </button>
+                            <a href="{{ route('services.show', $service) }}"
+                               class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 text-center">
+                                Detail
+                            </a>
                         </div>
                     </div>
                 @endforeach
