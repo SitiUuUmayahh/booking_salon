@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Customers - Admin')
-@section('page-title', 'Customers Management')
+@section('header', 'Customers Management')
 
 @section('content')
 <div class="bg-white rounded-lg shadow-md overflow-hidden">

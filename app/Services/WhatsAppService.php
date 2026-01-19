@@ -66,7 +66,6 @@ class WhatsAppService
             "⏰ Jam: %s\n" .
             "💰 DP: %s\n\n" .
             "Status: %s\n" .
-            "Link detail: %s",
             $booking->id,
             $booking->customer_name,
             $booking->service->name,
