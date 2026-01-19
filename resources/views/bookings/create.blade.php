@@ -82,7 +82,8 @@
                         <input type="date" name="booking_date" id="booking_date" 
                                min="{{ date('Y-m-d') }}" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                               value="{{ old('booking_date') }}">
+                               value="{{ old('booking_date') }}"
+                               onchange="checkAvailability()">
                         <p class="text-gray-500 text-sm mt-1">📅 Minimal 1 hari dari hari ini</p>
                         @error('booking_date')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -95,7 +96,8 @@
                             Jam Booking <span class="text-red-500">*</span>
                         </label>
                         <select name="booking_time" id="booking_time" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                onchange="checkAvailability()">
                             <option value="">-- Pilih Jam --</option>
                             <option value="09:00" {{ old('booking_time') === '09:00' ? 'selected' : '' }}>09:00</option>
                             <option value="10:00" {{ old('booking_time') === '10:00' ? 'selected' : '' }}>10:00</option>
@@ -111,6 +113,21 @@
                             <option value="20:00" {{ old('booking_time') === '20:00' ? 'selected' : '' }}>20:00</option>
                         </select>
                         <p class="text-gray-500 text-sm mt-1">⏰ Jam operasional: 09:00 - 20:00</p>
+                        
+                        <!-- Slot Availability Display -->
+                        <div id="slotAvailability" class="hidden mt-3 p-4 rounded-lg border-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-gray-700">Status Slot:</p>
+                                    <p id="slotMessage" class="text-sm"></p>
+                                </div>
+                                <div class="text-right">
+                                    <p id="slotCount" class="text-3xl font-bold"></p>
+                                    <p class="text-xs text-gray-500">slot tersisa</p>
+                                </div>
+                            </div>
+                        </div>
+                        
                         @error('booking_time')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                         @enderror
@@ -208,9 +225,84 @@ function updateServiceInfo() {
         document.getElementById('servicePrice').textContent = service.price;
         document.getElementById('serviceDuration').textContent = service.duration;
         infoBox.classList.remove('hidden');
+        
+        // Cek availability jika tanggal dan waktu sudah dipilih
+        checkAvailability();
     } else {
         infoBox.classList.add('hidden');
+        hideSlotAvailability();
     }
+}
+
+// Fungsi untuk cek slot availability via AJAX
+async function checkAvailability() {
+    const serviceId = document.getElementById('service_id').value;
+    const bookingDate = document.getElementById('booking_date').value;
+    const bookingTime = document.getElementById('booking_time').value;
+    
+    // Reset display jika data belum lengkap
+    if (!serviceId || !bookingDate || !bookingTime) {
+        hideSlotAvailability();
+        return;
+    }
+    
+    try {
+        const response = await fetch('{{ route("api.bookings.check-availability") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                service_id: serviceId,
+                booking_date: bookingDate,
+                booking_time: bookingTime
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showSlotAvailability(result.data);
+        }
+    } catch (error) {
+        console.error('Error checking availability:', error);
+    }
+}
+
+function showSlotAvailability(slotInfo) {
+    const slotBox = document.getElementById('slotAvailability');
+    const slotCount = document.getElementById('slotCount');
+    const slotMessage = document.getElementById('slotMessage');
+    
+    slotCount.textContent = slotInfo.available;
+    slotMessage.textContent = `${slotInfo.booked} dari ${slotInfo.total} slot terisi`;
+    
+    // Ubah warna berdasarkan ketersediaan
+    slotBox.classList.remove('hidden', 'border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50', 'border-red-500', 'bg-red-50');
+    slotCount.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
+    
+    if (slotInfo.is_full) {
+        // Slot penuh - merah
+        slotBox.classList.add('border-red-500', 'bg-red-50');
+        slotCount.classList.add('text-red-600');
+        slotMessage.classList.add('text-red-700');
+    } else if (slotInfo.available <= 2) {
+        // Hampir penuh - kuning
+        slotBox.classList.add('border-yellow-500', 'bg-yellow-50');
+        slotCount.classList.add('text-yellow-600');
+        slotMessage.classList.add('text-yellow-700');
+    } else {
+        // Tersedia - hijau
+        slotBox.classList.add('border-green-500', 'bg-green-50');
+        slotCount.classList.add('text-green-600');
+        slotMessage.classList.add('text-green-700');
+    }
+}
+
+function hideSlotAvailability() {
+    const slotBox = document.getElementById('slotAvailability');
+    slotBox.classList.add('hidden');
 }
 
 // Initialize on page load if service was selected
