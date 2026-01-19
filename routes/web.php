@@ -89,4 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/bookings/{id}/upload-dp', [BookingController::class, 'uploadDpProof'])->name('bookings.upload-dp');
+    
+    // API: Check slot availability
+    Route::post('/api/bookings/check-availability', [BookingController::class, 'checkAvailability'])->name('api.bookings.check-availability');
 });
