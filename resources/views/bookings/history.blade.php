@@ -72,20 +72,23 @@
                                     </div>
                                 @endif
 
-                                <div class="flex justify-between items-center">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 border-t border-gray-200">
                                     <span class="text-sm text-gray-500">
                                         Dibuat: {{ $booking->created_at->format('d M Y H:i') }}
                                     </span>
-                                    <div class="space-x-2">
-                                        <a href="{{ route('bookings.show', $booking->id) }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                                    <div class="flex gap-2 w-full sm:w-auto">
+                                        <a href="{{ route('bookings.show', $booking->id) }}"
+                                           class="flex-1 sm:flex-none text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 shadow-sm">
                                             Detail
                                         </a>
 
                                         @if($booking->status === 'pending')
-                                            <form method="POST" action="{{ route('bookings.cancel', $booking->id) }}" class="inline-block">
+                                            <form method="POST" action="{{ route('bookings.cancel', $booking->id) }}" class="flex-1 sm:flex-none">
                                                 @csrf
-                                                <button type="submit" onclick="return confirm('Yakin ingin membatalkan booking ini?')" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                                                    Batalkan
+                                                <button type="submit"
+                                                        onclick="return confirm('Yakin ingin membatalkan booking ini?')"
+                                                        class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 shadow-sm">
+                                                    Batal
                                                 </button>
                                             </form>
                                         @endif

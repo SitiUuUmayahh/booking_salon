@@ -119,7 +119,7 @@
                                 </div>
 
                                 <!-- Status Badge -->
-                                <div class="flex items-center space-x-4">
+                                <div class="flex items-center gap-3">
                                     @php
                                         $statusClass = match($booking->status) {
                                             'pending' => 'bg-yellow-100 text-yellow-800',
@@ -129,20 +129,22 @@
                                             default => 'bg-gray-100 text-gray-800'
                                         };
                                     @endphp
-                                    <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusClass }}">
+                                    <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusClass }} whitespace-nowrap">
                                         {{ ucfirst($booking->status) }}
                                     </span>
 
                                     <!-- Action -->
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('bookings.show', $booking) }}" class="text-pink-600 hover:text-pink-700 font-semibold text-sm">
+                                    <div class="flex gap-2">
+                                        <a href="{{ route('bookings.show', $booking) }}"
+                                           class="bg-pink-600 hover:bg-pink-700 text-white font-semibold text-sm px-4 py-2 rounded-lg transition duration-200 whitespace-nowrap">
                                             Detail
                                         </a>
                                         @if($booking->status === 'pending')
-                                            <form action="{{ route('bookings.cancel', $booking) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
+                                            <form action="{{ route('bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Yakin ingin membatalkan booking ini?')">
                                                 @csrf
                                                 @method('POST')
-                                                <button type="submit" class="text-red-600 hover:text-red-700 font-semibold text-sm">
+                                                <button type="submit"
+                                                        class="bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-4 py-2 rounded-lg transition duration-200 whitespace-nowrap">
                                                     Batal
                                                 </button>
                                             </form>
