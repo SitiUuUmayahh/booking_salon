@@ -177,7 +177,8 @@
                             <strong>ⓘ Informasi Penting:</strong>
                         </p>
                         <ul class="text-blue-700 text-sm mt-2 space-y-1 list-disc list-inside">
-                            <li>Booking akan dikonfirmasi admin maksimal 1x24 jam</li>
+                            <li>Setelah booking, lakukan pembayaran DP terlebih dahulu</li>
+                            <li>Booking akan dikonfirmasi admin setelah pembayaran DP diterima (maksimal 1x24 jam)</li>
                             <li>Harap datang 10 menit sebelum waktu booking</li>
                             <li>Pembatalan hanya bisa dilakukan sebelum dikonfirmasi</li>
                         </ul>
