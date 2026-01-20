@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\Admin\AdminServiceController;
+use App\Http\Controllers\Admin\AdminNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +75,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // User Management
     Route::post('/users/{id}/unsuspend', [AdminController::class, 'unsuspendUser'])->name('users.unsuspend');
     Route::post('/users/{id}/reset-cancel-count', [AdminController::class, 'resetCancelCount'])->name('users.reset-cancel-count');
+
+    // Notifications Management
+    Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/create', [AdminNotificationController::class, 'create'])->name('notifications.create');
+    Route::post('/notifications', [AdminNotificationController::class, 'store'])->name('notifications.store');
+    Route::get('/notifications/{notification}', [AdminNotificationController::class, 'show'])->name('notifications.show');
+    Route::get('/notifications/{notification}/edit', [AdminNotificationController::class, 'edit'])->name('notifications.edit');
+    Route::put('/notifications/{notification}', [AdminNotificationController::class, 'update'])->name('notifications.update');
+    Route::delete('/notifications/{notification}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::patch('/notifications/{notification}/toggle-active', [AdminNotificationController::class, 'toggleActive'])->name('notifications.toggle-active');
 });
 
 /*

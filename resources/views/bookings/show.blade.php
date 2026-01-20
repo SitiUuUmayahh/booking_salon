@@ -5,6 +5,9 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Admin Notifications -->
+        @include('components.admin-notifications')
+
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('bookings.history') }}" class="text-pink-600 hover:text-pink-700 flex items-center">

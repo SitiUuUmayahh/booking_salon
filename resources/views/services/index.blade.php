@@ -3,6 +3,11 @@
 @section('content')
 <div class="bg-gradient-to-br from-purple-50 to-blue-50">
     <div class="max-w-7xl mx-auto">
+        <!-- Admin Notifications -->
+        <div class="px-4 sm:px-6 lg:px-8">
+            @include('components.admin-notifications')
+        </div>
+
         <!-- Header Section -->
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Layanan Kami</h1>

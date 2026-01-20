@@ -5,6 +5,9 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Admin Notifications -->
+        @include('components.admin-notifications')
+
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Riwayat Booking</h1>
