@@ -153,12 +153,19 @@ class BookingController extends Controller
             if ($booking->booking_group_id && !in_array($booking->booking_group_id, $processedGroups)) {
                 // Group booking - ambil sebagai group
                 $groupBookings = $allBookings->where('booking_group_id', $booking->booking_group_id)->values();
+                
+                // Hitung total untuk group
+                $totalPrice = $groupBookings->sum(function($b) {
+                    return $b->service->price;
+                });
+                
                 $groupedBookings[] = [
                     'is_group' => true,
                     'group_id' => $booking->booking_group_id,
                     'bookings' => $groupBookings,
                     'main_booking' => $groupBookings->first(),
-                    'created_at' => $booking->created_at
+                    'created_at' => $booking->created_at,
+                    'total_formatted' => 'Rp ' . number_format($totalPrice, 0, ',', '.')
                 ];
                 $processedGroups[] = $booking->booking_group_id;
             } elseif (!$booking->booking_group_id) {
@@ -167,7 +174,8 @@ class BookingController extends Controller
                     'is_group' => false,
                     'bookings' => collect([$booking]),
                     'main_booking' => $booking,
-                    'created_at' => $booking->created_at
+                    'created_at' => $booking->created_at,
+                    'total_formatted' => $booking->service->formatted_price
                 ];
             }
         }
