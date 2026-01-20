@@ -27,9 +27,11 @@
                     <div class="mt-2 text-sm text-blue-700">
                         <ul class="list-disc list-inside space-y-1">
                             <li>Jam operasional: 09:00 - 20:00</li>
+                            <li><strong>Booking memerlukan pembayaran DP (Down Payment) terlebih dahulu</strong></li>
                             <li>Booking akan dikonfirmasi oleh admin maksimal 1x24 jam</li>
                             <li>Harap datang 10 menit sebelum waktu booking</li>
                             <li>Pembatalan booking hanya bisa dilakukan sebelum dikonfirmasi</li>
+                            <li><strong>Apabila booking dibatalkan, DP tidak akan dikembalikan (hangus)</strong></li>
                         </ul>
                     </div>
                 </div>
