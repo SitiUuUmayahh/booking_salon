@@ -14,6 +14,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'service_id',
+        'booking_group_id',
         'customer_name',
         'booking_date',
         'booking_time',
@@ -120,5 +121,57 @@ class Booking extends Model
     public function getWhatsAppCustomerMessageAttribute()
     {
         return WhatsAppService::generateCustomerMessage($this);
+    }
+
+    /**
+     * Get related bookings in the same group
+     */
+    public function groupedBookings()
+    {
+        if (!$this->booking_group_id) {
+            return collect([$this]);
+        }
+
+        return self::where('booking_group_id', $this->booking_group_id)
+            ->with('service')
+            ->orderBy('created_at')
+            ->get();
+    }
+
+    /**
+     * Check if this booking is part of a group
+     */
+    public function isGroupBooking()
+    {
+        return !is_null($this->booking_group_id);
+    }
+
+    /**
+     * Get total price for grouped bookings
+     */
+    public function getTotalGroupPriceAttribute()
+    {
+        if (!$this->booking_group_id) {
+            return $this->service->price ?? 0;
+        }
+
+        return self::where('booking_group_id', $this->booking_group_id)
+            ->join('services', 'bookings.service_id', '=', 'services.id')
+            ->sum('services.price');
+    }
+
+    /**
+     * Get group services names
+     */
+    public function getGroupServicesNamesAttribute()
+    {
+        if (!$this->booking_group_id) {
+            return [$this->service->name ?? 'Unknown Service'];
+        }
+
+        return self::where('booking_group_id', $this->booking_group_id)
+            ->join('services', 'bookings.service_id', '=', 'services.id')
+            ->pluck('services.name')
+            ->toArray();
     }
 }

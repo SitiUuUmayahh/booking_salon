@@ -37,15 +37,22 @@ class BookingController extends Controller
             ])->withInput();
         }
 
-        // 🔒 ANTI-SPAM 2: Cooldown Period (30 menit)
-        if ($user->last_booking_at) {
-            $minutesSinceLastBooking = Carbon::parse($user->last_booking_at)->diffInMinutes(now());
-            if ($minutesSinceLastBooking < 30) {
-                $remainingMinutes = 30 - $minutesSinceLastBooking;
-                return back()->withErrors([
-                    'error' => "Mohon tunggu {$remainingMinutes} menit lagi sebelum membuat booking baru."
-                ])->withInput();
-            }
+        // 🔒 ANTI-SPAM 2: Cooldown Period (30 menit) - DINONAKTIFKAN UNTUK MEMUNGKINKAN 3 BOOKING/HARI
+        // if ($user->last_booking_at) {
+        //     $minutesSinceLastBooking = Carbon::parse($user->last_booking_at)->diffInMinutes(now());
+        //     if ($minutesSinceLastBooking < 30) {
+        //         $remainingMinutes = 30 - $minutesSinceLastBooking;
+        //         return back()->withErrors([
+        //             'error' => "Mohon tunggu {$remainingMinutes} menit lagi sebelum membuat booking baru."
+        //         ])->withInput();
+        //     }
+        // }
+
+        // 🔒 ANTI-SPAM 2.1: Batasan booking per hari (max 3 booking per hari)
+        if ($user->hasReachedDailyBookingLimit()) {
+            return back()->withErrors([
+                'error' => 'Anda sudah mencapai batas maksimal 3 booking per hari. Silakan coba lagi besok.'
+            ])->withInput();
         }
 
         // 🔒 ANTI-SPAM 3: Batasan booking aktif (max 5 booking pending/confirmed)
@@ -60,14 +67,17 @@ class BookingController extends Controller
         }
 
         $validated = $request->validate([
-            'service_id' => ['required', 'exists:services,id'],
+            'service_ids' => ['required', 'array', 'min:1', 'max:3'],
+            'service_ids.*' => ['required', 'exists:services,id'],
             'customer_name' => ['required', 'string', 'max:255'],
             'booking_date' => ['required', 'date', 'after_or_equal:today'],
             'booking_time' => ['required', 'date_format:H:i'],
             'notes' => ['nullable', 'string', 'max:500'],
         ], [
-            'service_id.required' => 'Pilih layanan yang ingin Anda booking',
-            'service_id.exists' => 'Layanan yang dipilih tidak valid',
+            'service_ids.required' => 'Pilih minimal satu layanan',
+            'service_ids.min' => 'Pilih minimal satu layanan',
+            'service_ids.max' => 'Maksimal 3 layanan per booking',
+            'service_ids.*.exists' => 'Salah satu layanan yang dipilih tidak valid',
             'customer_name.required' => 'Nama pelanggan harus diisi',
             'booking_date.required' => 'Tanggal booking harus diisi',
             'booking_date.after_or_equal' => 'Tanggal booking tidak boleh di masa lalu',
@@ -97,27 +107,41 @@ class BookingController extends Controller
             ])->withInput();
         }
 
-        // Hitung DP (50% dari harga service)
-        $service = Service::findOrFail($validated['service_id']);
-        $dpAmount = $service->price * 0.5; // 50% DP
+        // Hitung total harga dan DP untuk semua services
+        $serviceIds = $validated['service_ids'];
+        $services = Service::whereIn('id', $serviceIds)->get();
+        $totalPrice = $services->sum('price');
+        $dpAmount = $totalPrice * 0.5; // 50% DP dari total harga
 
-        $booking = Booking::create([
-            'user_id' => Auth::id(),  // ID user yang sedang login
-            'service_id' => $validated['service_id'],
-            'customer_name' => $validated['customer_name'],
-            'booking_date' => $validated['booking_date'],
-            'booking_time' => $validated['booking_time'],
-            'notes' => $validated['notes'],
-            'status' => 'pending',  // Status awal selalu pending
-            'dp_amount' => $dpAmount,
-            'dp_status' => 'unpaid', // Belum bayar DP
-        ]);
+        // Generate unique group ID untuk multiple bookings
+        $bookingGroupId = 'BG-' . uniqid() . '-' . time();
+
+        // Create bookings untuk setiap service dalam satu grup
+        $bookings = [];
+        foreach ($serviceIds as $serviceId) {
+            $booking = Booking::create([
+                'user_id' => Auth::id(),
+                'service_id' => $serviceId,
+                'booking_group_id' => $bookingGroupId,
+                'customer_name' => $validated['customer_name'],
+                'booking_date' => $validated['booking_date'],
+                'booking_time' => $validated['booking_time'],
+                'notes' => $validated['notes'],
+                'status' => 'pending',
+                'dp_amount' => $dpAmount, // DP total dibagi ke semua booking dalam grup
+                'dp_status' => 'unpaid',
+            ]);
+            
+            $bookings[] = $booking;
+        }
 
         // Update last_booking_at untuk cooldown tracking
         $user->update(['last_booking_at' => now()]);
 
-        return redirect()->route('bookings.show', $booking->id)
-            ->with('success', 'Booking berhasil dibuat! Silakan upload bukti pembayaran DP untuk melanjutkan.');
+        // Redirect ke booking pertama dalam grup (untuk tampilan)
+        $firstBooking = $bookings[0];
+        return redirect()->route('bookings.show', $firstBooking->id)
+            ->with('success', 'Booking berhasil dibuat untuk ' . count($services) . ' layanan! Silakan upload bukti pembayaran DP untuk melanjutkan.');
     }
 
     public function history()
@@ -125,13 +149,59 @@ class BookingController extends Controller
         // Ambil booking milik user yang login, dengan relasi service
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $bookings = $user
+        
+        // Group bookings by booking_group_id atau individual booking
+        $allBookings = $user
             ->bookings()
-            ->with('service')  // Eager loading untuk avoid N+1 query
+            ->with('service')
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->get();
+            
+        // Group berdasarkan booking_group_id
+        $groupedBookings = [];
+        $processedGroups = [];
+        
+        foreach ($allBookings as $booking) {
+            if ($booking->booking_group_id && !in_array($booking->booking_group_id, $processedGroups)) {
+                // Group booking - ambil sebagai group
+                $groupBookings = $allBookings->where('booking_group_id', $booking->booking_group_id)->values();
+                $groupedBookings[] = [
+                    'is_group' => true,
+                    'group_id' => $booking->booking_group_id,
+                    'bookings' => $groupBookings,
+                    'main_booking' => $groupBookings->first(),
+                    'created_at' => $booking->created_at
+                ];
+                $processedGroups[] = $booking->booking_group_id;
+            } elseif (!$booking->booking_group_id) {
+                // Individual booking
+                $groupedBookings[] = [
+                    'is_group' => false,
+                    'bookings' => collect([$booking]),
+                    'main_booking' => $booking,
+                    'created_at' => $booking->created_at
+                ];
+            }
+        }
+        
+        // Sort by created_at dan convert ke collection
+        $bookings = collect($groupedBookings)->sortByDesc('created_at')->values();
+        
+        // Manual pagination
+        $currentPage = request()->get('page', 1);
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+        
+        $paginatedItems = $bookings->slice($offset, $perPage)->values();
+        $paginatedBookings = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedItems,
+            $bookings->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()]
+        );
 
-        return view('bookings.history', compact('bookings'));
+        return view('bookings.history', compact('paginatedBookings'));
     }
 
     public function show($id)

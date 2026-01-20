@@ -88,4 +88,28 @@ class User extends Authenticatable
 
         return '<span class="px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">✓ Baik</span>';
     }
+
+    /**
+     * Helper: Cek jumlah booking hari ini
+     */
+    public function getTodayBookingsCountAttribute()
+    {
+        return $this->bookings()->whereDate('created_at', \Carbon\Carbon::today())->count();
+    }
+
+    /**
+     * Helper: Cek apakah user sudah mencapai limit booking harian (3 per hari)
+     */
+    public function hasReachedDailyBookingLimit()
+    {
+        return $this->today_bookings_count >= 3;
+    }
+
+    /**
+     * Helper: Sisa booking yang bisa dilakukan hari ini
+     */
+    public function getRemainingTodayBookingsAttribute()
+    {
+        return max(0, 3 - $this->today_bookings_count);
+    }
 }

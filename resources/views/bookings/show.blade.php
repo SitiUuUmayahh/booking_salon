@@ -38,16 +38,54 @@
                         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Layanan
+                        {{ $booking->isGroupBooking() ? 'Paket Layanan' : 'Layanan' }}
                     </h2>
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h3 class="text-xl font-bold text-gray-800">{{ $booking->service->name }}</h3>
-                        <p class="text-gray-600 mt-2">{{ $booking->service->description }}</p>
-                        <div class="mt-4 flex justify-between items-center">
-                            <span class="text-2xl font-bold text-pink-600">{{ $booking->service->formatted_price }}</span>
-                            <span class="text-gray-600">⏱️ {{ $booking->service->formatted_duration }}</span>
+                    
+                    @if($booking->isGroupBooking())
+                        <!-- Multiple Services Display -->
+                        <div class="space-y-4">
+                            @foreach($booking->groupedBookings() as $groupBooking)
+                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-purple-500">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="text-lg font-bold text-gray-800">{{ $groupBooking->service->name }}</h3>
+                                            <p class="text-gray-600 text-sm">{{ $groupBooking->service->description ?? 'Layanan berkualitas tinggi' }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="text-lg font-bold text-pink-600">{{ $groupBooking->service->formatted_price }}</span>
+                                            <p class="text-sm text-gray-500">{{ $groupBooking->service->formatted_duration }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                            
+                            <!-- Total Price Summary -->
+                            <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-6 border border-pink-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800">Total Paket ({{ $booking->groupedBookings()->count() }} Layanan)</h3>
+                                        <p class="text-sm text-gray-600">Semua layanan akan dilakukan pada waktu yang sama</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-2xl font-bold text-pink-600">
+                                            Rp {{ number_format($booking->total_group_price, 0, ',', '.') }}
+                                        </span>
+                                        <p class="text-sm text-pink-500">Hemat dengan paket!</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <!-- Single Service Display -->
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800">{{ $booking->service->name }}</h3>
+                            <p class="text-gray-600 mt-2">{{ $booking->service->description }}</p>
+                            <div class="mt-4 flex justify-between items-center">
+                                <span class="text-2xl font-bold text-pink-600">{{ $booking->service->formatted_price }}</span>
+                                <span class="text-gray-600">⏱️ {{ $booking->service->formatted_duration }}</span>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Customer Info -->

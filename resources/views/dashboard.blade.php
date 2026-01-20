@@ -7,8 +7,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Welcome Banner -->
         <div class="bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-xl p-8 mb-8 text-white">
-            <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
-            <p class="text-pink-100">Pilih layanan yang Anda inginkan dan buat booking sekarang!</p>
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
+                    <p class="text-pink-100">Pilih layanan yang Anda inginkan dan buat booking sekarang!</p>
+                </div>
+            </div>
         </div>
 
         <!-- Services Grid -->

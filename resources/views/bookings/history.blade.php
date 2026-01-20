@@ -11,43 +11,158 @@
             <p class="text-gray-600 mt-2">Lihat semua riwayat booking Anda</p>
         </div>
 
-        @if($bookings->count() > 0)
+        @if($paginatedBookings->count() > 0)
             <!-- Bookings List -->
             <div class="space-y-4">
-                @foreach($bookings as $booking)
+                @foreach($paginatedBookings as $bookingGroup)
                     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-                        <div class="md:flex">
-                            <!-- Left Side: Service Image -->
-                            <div class="md:w-1/4 bg-gradient-to-br from-pink-400 to-purple-500 relative overflow-hidden">
-                                @if($booking->service->image)
-                                    <img src="{{ asset('storage/' . $booking->service->image) }}"
-                                         alt="{{ $booking->service->name }}"
-                                         class="w-full h-full object-cover absolute inset-0">
-                                @else
-                                    <div class="flex items-center justify-center h-full min-h-[200px]">
-                                        <span class="text-white text-6xl">💇</span>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Right Side: Booking Details -->
-                            <div class="md:w-3/4 p-6">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 class="text-xl font-bold text-gray-800">{{ $booking->service->name }}</h3>
-                                        <p class="text-gray-600">{{ $booking->customer_name }}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        {!! $booking->status_badge !!}
-                                        <div class="mt-1">
-                                            {!! $booking->dp_status_badge !!}
+                        @if($bookingGroup['is_group'])
+                            <!-- Group Booking Display -->
+                            <div class="md:flex">
+                                <!-- Left Side: Group Indicator -->
+                                <div class="md:w-1/4 bg-gradient-to-br from-purple-400 to-pink-500 relative overflow-hidden">
+                                    <div class="flex items-center justify-center h-full min-h-[200px] text-white">
+                                        <div class="text-center">
+                                            <span class="text-4xl mb-2 block">📦</span>
+                                            <span class="text-sm font-semibold">Paket Layanan</span>
+                                            <span class="text-xs block">{{ $bookingGroup['bookings']->count() }} Services</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div class="flex items-center text-gray-700">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Right Side: Group Booking Details -->
+                                <div class="md:w-3/4 p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-gray-800">
+                                                Paket Layanan ({{ $bookingGroup['bookings']->count() }} Services)
+                                            </h3>
+                                            <p class="text-gray-600">{{ $bookingGroup['main_booking']->customer_name }}</p>
+                                            <div class="mt-2 space-y-1">
+                                                @foreach($bookingGroup['bookings'] as $booking)
+                                                    <span class="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded mr-1">
+                                                        {{ $booking->service->name }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            {!! $bookingGroup['main_booking']->status_badge !!}
+                                            <div class="mt-1">
+                                                {!! $bookingGroup['main_booking']->dp_status_badge !!}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $bookingGroup['main_booking']->formatted_date }}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $bookingGroup['main_booking']->formatted_time }}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                            </svg>
+                                            <span class="text-sm font-semibold">
+                                                Rp {{ number_format($bookingGroup['bookings']->sum(function($b) { return $b->service->price; }), 0, ',', '.') }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-sm text-gray-600">{{ $bookingGroup['main_booking']->created_at->diffForHumans() }}</p>
+                                        <a href="{{ route('bookings.show', $bookingGroup['main_booking']->id) }}" 
+                                           class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                            Lihat Detail
+                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Single Booking Display -->
+                            @php $booking = $bookingGroup['main_booking']; @endphp
+                            <div class="md:flex">
+                                <!-- Left Side: Service Image -->
+                                <div class="md:w-1/4 bg-gradient-to-br from-pink-400 to-purple-500 relative overflow-hidden">
+                                    @if($booking->service->image)
+                                        <img src="{{ asset('storage/' . $booking->service->image) }}"
+                                             alt="{{ $booking->service->name }}"
+                                             class="w-full h-full object-cover absolute inset-0">
+                                    @else
+                                        <div class="flex items-center justify-center h-full min-h-[200px]">
+                                            <span class="text-white text-6xl">💇</span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Right Side: Booking Details -->
+                                <div class="md:w-3/4 p-6">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-gray-800">{{ $booking->service->name }}</h3>
+                                            <p class="text-gray-600">{{ $booking->customer_name }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            {!! $booking->status_badge !!}
+                                            <div class="mt-1">
+                                                {!! $booking->dp_status_badge !!}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $booking->formatted_date }}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $booking->formatted_time }}</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-700">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $booking->service->formatted_price }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-sm text-gray-600">{{ $booking->created_at->diffForHumans() }}</p>
+                                        <a href="{{ route('bookings.show', $booking->id) }}" 
+                                           class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                            Lihat Detail
+                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8">
+                {{ $paginatedBookings->links() }}
+            </div>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         {{ $booking->formatted_date }}

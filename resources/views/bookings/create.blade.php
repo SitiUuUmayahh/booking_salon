@@ -2,6 +2,12 @@
 
 @section('title', 'Form Booking - Dsisi Salon')
 
+@if($service)
+@push('meta')
+<meta name="pre-selected-service" content="{{ $service->id }}">
+@endpush
+@endif
+
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
     <div class="max-w-2xl mx-auto">
@@ -19,6 +25,8 @@
             <div class="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-8">
                 <h1 class="text-3xl font-bold">Buat Booking Baru</h1>
                 <p class="text-pink-100 mt-2">Lengkapi form di bawah untuk booking layanan</p>
+                
+
             </div>
 
             <!-- Form Body -->
@@ -28,36 +36,52 @@
 
                     <!-- Service Selection -->
                     <div>
-                        <label for="service_id" class="block text-gray-700 font-semibold mb-2">
+                        <label class="block text-gray-700 font-semibold mb-4">
                             Pilih Layanan <span class="text-red-500">*</span>
+                            <span class="text-sm font-normal text-gray-500">(Anda bisa memilih beberapa layanan sekaligus)</span>
                         </label>
-                        <select name="service_id" id="service_id" required 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                                onchange="updateServiceInfo()">
-                            <option value="">-- Pilih Layanan --</option>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($services as $svc)
-                                <option value="{{ $svc->id }}" {{ $service && $service->id === $svc->id ? 'selected' : '' }}>
-                                    {{ $svc->name }} ({{ $svc->formatted_price }}) - {{ $svc->formatted_duration }}
-                                </option>
+                                <div class="service-card border-2 border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer">
+                                    <label class="flex items-start cursor-pointer">
+                                        <input type="checkbox" 
+                                               name="service_ids[]" 
+                                               value="{{ $svc->id }}" 
+                                               class="service-checkbox mt-1 mr-3 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                               onchange="updateSelectedServices()"
+                                               {{ $service && $service->id === $svc->id ? 'checked' : '' }}>
+                                        <div class="flex-1">
+                                            <div class="font-semibold text-gray-800">{{ $svc->name }}</div>
+                                            <div class="text-sm text-gray-600 mb-2">{{ $svc->description ?? 'Layanan berkualitas tinggi' }}</div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-lg font-bold text-purple-600">{{ $svc->formatted_price }}</span>
+                                                <span class="text-sm text-gray-500">{{ $svc->formatted_duration }}</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
                             @endforeach
-                        </select>
-                        @error('service_id')
-                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Service Info Display -->
-                    <div id="serviceInfo" class="hidden bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border border-purple-200">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-gray-600 text-sm">Harga:</p>
-                                <p id="servicePrice" class="text-2xl font-bold text-purple-600"></p>
-                            </div>
-                            <div>
-                                <p class="text-gray-600 text-sm">Durasi:</p>
-                                <p id="serviceDuration" class="text-2xl font-bold text-blue-600"></p>
+                        </div>
+                        
+                        <!-- Selected Services Summary -->
+                        <div id="selected-summary" class="mt-4 p-4 bg-purple-50 rounded-lg border hidden">
+                            <h4 class="font-semibold text-purple-800 mb-2">Layanan yang Dipilih:</h4>
+                            <div id="selected-list" class="space-y-1"></div>
+                            <div class="mt-3 pt-3 border-t border-purple-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold text-purple-800">Total Harga:</span>
+                                    <span id="total-price" class="text-xl font-bold text-purple-600">Rp 0</span>
+                                </div>
+                                <div class="text-sm text-purple-600 mt-1">
+                                    DP (50%): <span id="dp-amount" class="font-semibold">Rp 0</span>
+                                </div>
                             </div>
                         </div>
+                        
+                        @error('service_ids')
+                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <!-- Customer Name -->
@@ -136,9 +160,11 @@
                             <strong>ⓘ Informasi Penting:</strong>
                         </p>
                         <ul class="text-blue-700 text-sm mt-2 space-y-1 list-disc list-inside">
-                            <li>Booking akan dikonfirmasi admin maksimal 1x24 jam</li>
+                            <li>Jam operasional: 09:00 - 20:00</li>
+                            <li>Booking akan dikonfirmasi oleh admin maksimal 1x24 jam</li>
                             <li>Harap datang 10 menit sebelum waktu booking</li>
-                            <li>Pembatalan hanya bisa dilakukan sebelum dikonfirmasi</li>
+                            <li>Pembatalan booking hanya bisa dilakukan sebelum dikonfirmasi</li>
+                            <li>Anda hanya dapat melakukan maksimal 3 booking per hari</li>
                         </ul>
                     </div>
 
@@ -187,37 +213,99 @@
     </div>
 </div>
 
-<script>
-// Data service dari database
-const servicesData = {
-    @foreach($services as $svc)
-        '{{ $svc->id }}': {
-            name: '{{ $svc->name }}',
-            price: '{{ $svc->formatted_price }}',
-            duration: '{{ $svc->formatted_duration }}'
-        },
-    @endforeach
-};
+<!-- JavaScript Data -->
+<script type="application/json" id="services-data">
+@php
+$servicesArray = [];
+foreach($services as $svc) {
+    $servicesArray[$svc->id] = [
+        'name' => $svc->name,
+        'price' => $svc->price,
+        'priceFormatted' => $svc->formatted_price,
+        'duration' => $svc->formatted_duration
+    ];
+}
+@endphp
+{!! json_encode($servicesArray) !!}
+</script>
 
-function updateServiceInfo() {
-    const serviceId = document.getElementById('service_id').value;
-    const infoBox = document.getElementById('serviceInfo');
+<script>
+// Load data from JSON script
+const servicesData = JSON.parse(document.getElementById('services-data').textContent);
+
+function updateSelectedServices() {
+    const checkboxes = document.querySelectorAll('.service-checkbox:checked');
+    const summaryDiv = document.getElementById('selected-summary');
+    const listDiv = document.getElementById('selected-list');
+    const totalPriceSpan = document.getElementById('total-price');
+    const dpAmountSpan = document.getElementById('dp-amount');
     
-    if (serviceId && servicesData[serviceId]) {
-        const service = servicesData[serviceId];
-        document.getElementById('servicePrice').textContent = service.price;
-        document.getElementById('serviceDuration').textContent = service.duration;
-        infoBox.classList.remove('hidden');
-    } else {
-        infoBox.classList.add('hidden');
+    // Update service cards visual feedback
+    document.querySelectorAll('.service-card').forEach(card => {
+        const checkbox = card.querySelector('.service-checkbox');
+        if (checkbox.checked) {
+            card.classList.add('border-purple-500', 'bg-purple-50');
+            card.classList.remove('border-gray-200');
+        } else {
+            card.classList.remove('border-purple-500', 'bg-purple-50');
+            card.classList.add('border-gray-200');
+        }
+    });
+    
+    if (checkboxes.length === 0) {
+        summaryDiv.classList.add('hidden');
+        return;
     }
+    
+    // Show summary
+    summaryDiv.classList.remove('hidden');
+    
+    // Build selected services list
+    let totalPrice = 0;
+    let servicesHtml = '';
+    
+    checkboxes.forEach(checkbox => {
+        const serviceId = checkbox.value;
+        const service = servicesData[serviceId];
+        
+        if (service) {
+            totalPrice += service.price;
+            servicesHtml += `
+                <div class="flex justify-between text-sm">
+                    <span>${service.name}</span>
+                    <span class="font-semibold">${service.priceFormatted}</span>
+                </div>
+            `;
+        }
+    });
+    
+    // Update display
+    listDiv.innerHTML = servicesHtml;
+    totalPriceSpan.textContent = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(totalPrice);
+    
+    const dpAmount = totalPrice / 2;
+    dpAmountSpan.textContent = new Intl.NumberFormat('id-ID', {
+        style: 'currency', 
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(dpAmount);
 }
 
-// Initialize on page load if service was selected
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    @if($service)
-        updateServiceInfo();
-    @endif
+    // Check for pre-selected service from server
+    const preSelectedServiceId = document.querySelector('meta[name="pre-selected-service"]')?.getAttribute('content');
+    if (preSelectedServiceId) {
+        const preSelectedCheckbox = document.querySelector('input[value="' + preSelectedServiceId + '"]');
+        if (preSelectedCheckbox) {
+            preSelectedCheckbox.checked = true;
+            updateSelectedServices();
+        }
+    }
 });
 </script>
 @endsection
