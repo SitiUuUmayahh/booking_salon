@@ -38,15 +38,6 @@
                 <!-- Form Login -->
                 <form method="POST" action="{{ route('login.post') }}">
                     @csrf
-                    
-                    <!-- DEBUG INFO -->
-                    @if(config('app.debug'))
-                        <div class="bg-yellow-50 p-3 rounded mb-4 text-sm">
-                            <p><strong>Debug Info:</strong></p>
-                            <p>Admin Email: admin@dsisisalon.com</p>
-                            <p>Admin Password: admin123</p>
-                        </div>
-                    @endif
 
                     <!-- Email -->
                     <div class="mb-6">
