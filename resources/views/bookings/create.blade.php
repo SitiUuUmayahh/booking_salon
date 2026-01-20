@@ -89,7 +89,7 @@
                         <label for="customer_name" class="block text-gray-700 font-semibold mb-2">
                             Nama Lengkap <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" name="customer_name" id="customer_name" 
+                        <input type="text" name="customer_name" id="customer_name"
                                value="{{ Auth::user()->name }}" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                placeholder="Masukkan nama Anda">
@@ -103,10 +103,11 @@
                         <label for="booking_date" class="block text-gray-700 font-semibold mb-2">
                             Tanggal Booking <span class="text-red-500">*</span>
                         </label>
-                        <input type="date" name="booking_date" id="booking_date" 
+                        <input type="date" name="booking_date" id="booking_date"
                                min="{{ date('Y-m-d') }}" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                               value="{{ old('booking_date') }}">
+                               value="{{ old('booking_date') }}"
+                               onchange="checkAvailability()">
                         <p class="text-gray-500 text-sm mt-1">📅 Minimal 1 hari dari hari ini</p>
                         @error('booking_date')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -119,7 +120,8 @@
                             Jam Booking <span class="text-red-500">*</span>
                         </label>
                         <select name="booking_time" id="booking_time" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                onchange="checkAvailability()">
                             <option value="">-- Pilih Jam --</option>
                             <option value="09:00" {{ old('booking_time') === '09:00' ? 'selected' : '' }}>09:00</option>
                             <option value="10:00" {{ old('booking_time') === '10:00' ? 'selected' : '' }}>10:00</option>
@@ -135,6 +137,45 @@
                             <option value="20:00" {{ old('booking_time') === '20:00' ? 'selected' : '' }}>20:00</option>
                         </select>
                         <p class="text-gray-500 text-sm mt-1">⏰ Jam operasional: 09:00 - 20:00</p>
+
+                        <!-- Slot Availability Display -->
+                        <div id="slotAvailability" class="hidden mt-3 p-4 rounded-lg border-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-700">Status Slot:</p>
+                                    <p id="slotMessage" class="text-sm mt-1"></p>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <p id="slotCount" class="text-3xl font-bold"></p>
+                                    <p class="text-xs text-gray-500">slot tersisa</p>
+                                </div>
+                            </div>
+                            <!-- Pesan untuk slot penuh -->
+                            <div id="slotFullAlert" class="hidden mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-red-800">Slot waktu ini sudah penuh!</p>
+                                        <p class="text-xs text-red-700 mt-1">Silakan pilih waktu atau tanggal lain yang masih tersedia.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pesan untuk slot hampir penuh -->
+                            <div id="slotWarningAlert" class="hidden mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-yellow-800">Slot hampir penuh!</p>
+                                        <p class="text-xs text-yellow-700 mt-1">Segera booking sebelum slot habis.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         @error('booking_time')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                         @enderror
@@ -161,7 +202,8 @@
                         </p>
                         <ul class="text-blue-700 text-sm mt-2 space-y-1 list-disc list-inside">
                             <li>Jam operasional: 09:00 - 20:00</li>
-                            <li>Booking akan dikonfirmasi oleh admin maksimal 1x24 jam</li>
+                            <li>Setelah booking, lakukan pembayaran DP terlebih dahulu</li>
+                            <li>Booking akan dikonfirmasi admin setelah pembayaran DP diterima (maksimal 1x24 jam)</li>
                             <li>Harap datang 10 menit sebelum waktu booking</li>
                             <li>Pembatalan booking hanya bisa dilakukan sebelum dikonfirmasi</li>
                             <li>Anda hanya dapat melakukan maksimal 3 booking per hari</li>
@@ -170,11 +212,11 @@
 
                     <!-- Action Buttons -->
                     <div class="flex gap-4 pt-6">
-                        <a href="{{ route('dashboard') }}" 
+                        <a href="{{ route('dashboard') }}"
                            class="flex-1 px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors duration-200 font-semibold text-center">
                             Batal
                         </a>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-200 font-semibold">
                             Konfirmasi Booking
                         </button>
@@ -305,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
             preSelectedCheckbox.checked = true;
             updateSelectedServices();
         }
-    }
 });
 </script>
 @endsection

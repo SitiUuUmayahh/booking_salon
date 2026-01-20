@@ -15,6 +15,7 @@ class Service extends Model
         'price',
         'duration',
         'image',
+        'max_bookings',
     ];
 
     public function bookings()
@@ -39,5 +40,30 @@ class Service extends Model
             return $hours . ' jam';
         }
         return $this->duration . ' menit';
+    }
+
+    /**
+     * Cek slot tersedia untuk tanggal dan waktu tertentu
+     * 
+     * @param string $date Format: Y-m-d
+     * @param string $time Format: H:i
+     * @return array ['available' => int, 'booked' => int, 'is_full' => bool]
+     */
+    public function getAvailableSlots($date, $time)
+    {
+        $bookedCount = Booking::where('service_id', $this->id)
+            ->where('booking_date', $date)
+            ->where('booking_time', $time)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->count();
+
+        $availableSlots = $this->max_bookings - $bookedCount;
+
+        return [
+            'available' => max(0, $availableSlots),
+            'booked' => $bookedCount,
+            'total' => $this->max_bookings,
+            'is_full' => $bookedCount >= $this->max_bookings
+        ];
     }
 }

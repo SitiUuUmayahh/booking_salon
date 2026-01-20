@@ -5,6 +5,9 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Admin Notifications -->
+        @include('components.admin-notifications')
+
         <!-- Back Button -->
         <div class="mb-6">
             <a href="{{ route('bookings.history') }}" class="text-pink-600 hover:text-pink-700 flex items-center">
@@ -120,14 +123,64 @@
                         </svg>
                         Jadwal Booking
                     </h2>
-                    <div class="bg-gray-50 rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-sm text-gray-600">Tanggal</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ $booking->formatted_date }}</p>
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Tanggal</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ $booking->formatted_date }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Jam</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ $booking->formatted_time }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Jam</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ $booking->formatted_time }}</p>
+                        
+                        <!-- Slot Availability Info -->
+                        <div class="mt-4 p-4 rounded-lg border-2 
+                            @if($slotInfo['is_full']) 
+                                bg-red-50 border-red-500
+                            @elseif($slotInfo['available'] <= 2) 
+                                bg-yellow-50 border-yellow-500
+                            @else 
+                                bg-green-50 border-green-500
+                            @endif">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold 
+                                        @if($slotInfo['is_full']) 
+                                            text-red-700
+                                        @elseif($slotInfo['available'] <= 2) 
+                                            text-yellow-700
+                                        @else 
+                                            text-green-700
+                                        @endif">
+                                        Ketersediaan Slot Waktu Ini:
+                                    </p>
+                                    <p class="text-sm 
+                                        @if($slotInfo['is_full']) 
+                                            text-red-600
+                                        @elseif($slotInfo['available'] <= 2) 
+                                            text-yellow-600
+                                        @else 
+                                            text-green-600
+                                        @endif">
+                                        {{ $slotInfo['booked'] }} dari {{ $slotInfo['total'] }} slot terisi
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-4xl font-bold 
+                                        @if($slotInfo['is_full']) 
+                                            text-red-600
+                                        @elseif($slotInfo['available'] <= 2) 
+                                            text-yellow-600
+                                        @else 
+                                            text-green-600
+                                        @endif">
+                                        {{ $slotInfo['available'] }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">slot tersisa</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

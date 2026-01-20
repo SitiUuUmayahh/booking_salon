@@ -3,6 +3,11 @@
 @section('content')
 <div class="bg-gradient-to-br from-purple-50 to-blue-50">
     <div class="max-w-7xl mx-auto">
+        <!-- Admin Notifications -->
+        <div class="px-4 sm:px-6 lg:px-8">
+            @include('components.admin-notifications')
+        </div>
+
         <!-- Header Section -->
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Layanan Kami</h1>
@@ -26,8 +31,8 @@
                         <!-- Service Image -->
                         @if($service->image)
                             <div class="relative h-64 overflow-hidden bg-gray-200">
-                                <img src="{{ asset('storage/' . $service->image) }}" 
-                                     alt="{{ $service->name }}" 
+                                <img src="{{ asset('storage/' . $service->image) }}"
+                                     alt="{{ $service->name }}"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                 <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
                             </div>
@@ -64,17 +69,17 @@
 
                             <!-- Action Buttons -->
                             <div class="flex gap-3">
-                                <a href="{{ route('services.show', $service) }}" 
+                                <a href="{{ route('services.show', $service) }}"
                                    class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 text-center font-medium text-sm">
                                     Detail
                                 </a>
                                 @auth
-                                    <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
+                                    <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}"
                                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-center font-medium text-sm">
-                                        Pesan
+                                        Booking
                                     </a>
                                 @else
-                                    <a href="{{ route('login') }}" 
+                                    <a href="{{ route('login') }}"
                                        class="flex-1 px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 text-center font-medium text-sm">
                                         Login
                                     </a>

@@ -5,12 +5,39 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Admin Notifications -->
+        @include('components.admin-notifications')
+
         <!-- Welcome Banner -->
         <div class="bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-xl p-8 mb-8 text-white">
             <div class="flex justify-between items-start">
                 <div>
                     <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
                     <p class="text-pink-100">Pilih layanan yang Anda inginkan dan buat booking sekarang!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Info -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-blue-800">Informasi Booking</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Jam operasional: 09:00 - 20:00</li>
+                            <li><strong>Booking memerlukan pembayaran DP (Down Payment) terlebih dahulu</strong></li>
+                            <li>Booking akan dikonfirmasi oleh admin maksimal 1x24 jam</li>
+                            <li>Harap datang 10 menit sebelum waktu booking</li>
+                            <li>Pembatalan booking hanya bisa dilakukan sebelum dikonfirmasi</li>
+                            <li><strong>Apabila booking dibatalkan, DP tidak akan dikembalikan (hangus)</strong></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,39 +69,13 @@
                                 <span class="text-sm text-gray-500">⏱️ {{ $service->formatted_duration }}</span>
                             </div>
 
-                            <button
-                                type="button"
-                                data-booking-btn
-                                data-service-id="{{ $service->id }}"
-                                data-service-name="{{ $service->name }}"
-                                class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                                Booking Sekarang
-                            </button>
+                            <a href="{{ route('services.show', $service) }}"
+                               class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 text-center">
+                                Detail
+                            </a>
                         </div>
                     </div>
                 @endforeach
-            </div>
-        </div>
-
-        <!-- Booking Info -->
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-lg font-medium text-blue-800">Informasi Booking</h3>
-                    <div class="mt-2 text-sm text-blue-700">
-                        <ul class="list-disc list-inside space-y-1">
-                            <li>Jam operasional: 09:00 - 20:00</li>
-                            <li>Booking akan dikonfirmasi oleh admin maksimal 1x24 jam</li>
-                            <li>Harap datang 10 menit sebelum waktu booking</li>
-                            <li>Pembatalan booking hanya bisa dilakukan sebelum dikonfirmasi</li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
 

@@ -18,8 +18,8 @@
                 <div>
                     @if($service->image)
                         <div class="h-96 rounded-lg overflow-hidden bg-gray-200">
-                            <img src="{{ asset('storage/' . $service->image) }}" 
-                                 alt="{{ $service->name }}" 
+                            <img src="{{ asset('storage/' . $service->image) }}"
+                                 alt="{{ $service->name }}"
                                  class="w-full h-full object-cover">
                         </div>
                     @else
@@ -36,7 +36,7 @@
                     <!-- Header -->
                     <div>
                         <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $service->name }}</h1>
-                        
+
                         <!-- Description -->
                         <p class="text-gray-600 text-lg mb-8 leading-relaxed">
                             {{ $service->description }}
@@ -55,20 +55,26 @@
                                 <p class="text-gray-600 text-sm font-medium mb-1">Durasi Layanan</p>
                                 <p class="text-2xl font-bold text-blue-600">{{ $service->formatted_duration }}</p>
                             </div>
+
+                            <!-- Max Bookings -->
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                                <p class="text-gray-600 text-sm font-medium mb-1">Kapasitas per Slot</p>
+                                <p class="text-2xl font-bold text-green-600">{{ $service->max_bookings }} orang</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="flex gap-4 mt-8">
                         @auth
-                            <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}" 
+                            <a href="{{ route('bookings.create', ['service_id' => $service->id]) }}"
                                class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-semibold text-center">
-                                Pesan Sekarang
+                                Booking Sekarang
                             </a>
                         @else
-                            <a href="{{ route('login') }}" 
+                            <a href="{{ route('login') }}"
                                class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-semibold text-center">
-                                Login untuk Pesan
+                                Login untuk Booking
                             </a>
                         @endauth
                     </div>
@@ -85,8 +91,8 @@
                         <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
                             @if($relatedService->image)
                                 <div class="h-48 overflow-hidden bg-gray-200">
-                                    <img src="{{ asset('storage/' . $relatedService->image) }}" 
-                                         alt="{{ $relatedService->name }}" 
+                                    <img src="{{ asset('storage/' . $relatedService->image) }}"
+                                         alt="{{ $relatedService->name }}"
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                 </div>
                             @else
@@ -96,11 +102,11 @@
                                     </svg>
                                 </div>
                             @endif
-                            
+
                             <div class="p-4">
                                 <h3 class="font-bold text-gray-900 mb-2">{{ $relatedService->name }}</h3>
                                 <p class="text-purple-600 font-semibold">{{ $relatedService->formatted_price }}</p>
-                                <a href="{{ route('services.show', $relatedService) }}" 
+                                <a href="{{ route('services.show', $relatedService) }}"
                                    class="mt-4 block text-center px-4 py-2 bg-purple-100 text-purple-600 rounded hover:bg-purple-200 transition-colors duration-200 font-medium text-sm">
                                     Lihat Detail
                                 </a>
