@@ -347,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             preSelectedCheckbox.checked = true;
             updateSelectedServices();
         }
+    }
 });
 </script>
 @endsection
