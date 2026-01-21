@@ -161,6 +161,36 @@ class Booking extends Model
     }
 
     /**
+     * Get total DP for grouped bookings
+     */
+    public function getTotalGroupDpAttribute()
+    {
+        if (!$this->booking_group_id) {
+            return $this->dp_amount;
+        }
+
+        return self::where('booking_group_id', $this->booking_group_id)
+            ->sum('dp_amount');
+    }
+
+    /**
+     * Get formatted total DP for grouped bookings
+     */
+    public function getFormattedTotalGroupDpAttribute()
+    {
+        return 'Rp ' . number_format($this->total_group_dp, 0, ',', '.');
+    }
+
+    /**
+     * Get remaining payment for grouped bookings
+     */
+    public function getGroupRemainingPaymentAttribute()
+    {
+        $remaining = $this->total_group_price - $this->total_group_dp;
+        return 'Rp ' . number_format($remaining, 0, ',', '.');
+    }
+
+    /**
      * Get group services names
      */
     public function getGroupServicesNamesAttribute()

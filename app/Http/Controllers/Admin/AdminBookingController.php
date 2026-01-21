@@ -95,10 +95,25 @@ class AdminBookingController extends Controller
             ]);
         }
 
-        // Update status ke confirmed
-        $booking->update(['status' => 'confirmed']);
+        // 🔥 FITUR BARU: Konfirmasi semua booking terkait yang dibuat bersamaan
+        $relatedBookings = Booking::where('user_id', $booking->user_id)
+            ->where('booking_date', $booking->booking_date)
+            ->where('booking_time', $booking->booking_time)
+            ->where('status', 'pending')
+            ->where('dp_status', 'verified')
+            ->get();
 
-        return back()->with('success', 'Booking berhasil dikonfirmasi');
+        // Update semua booking terkait ke confirmed
+        foreach ($relatedBookings as $relatedBooking) {
+            $relatedBooking->update(['status' => 'confirmed']);
+        }
+
+        $bookingCount = $relatedBookings->count();
+        $message = $bookingCount > 1
+            ? "Berhasil mengkonfirmasi {$bookingCount} booking sekaligus!"
+            : 'Booking berhasil dikonfirmasi';
+
+        return back()->with('success', $message);
     }
 
     /**
@@ -183,12 +198,28 @@ class AdminBookingController extends Controller
             ]);
         }
 
-        $booking->update([
-            'dp_status' => 'verified',
-            'dp_verified_at' => now(),
-        ]);
+        // 🔥 FITUR BARU: Verifikasi semua booking terkait dengan bukti DP yang sama
+        $relatedBookings = Booking::where('user_id', $booking->user_id)
+            ->where('booking_date', $booking->booking_date)
+            ->where('booking_time', $booking->booking_time)
+            ->where('dp_payment_proof', $booking->dp_payment_proof)
+            ->where('dp_status', 'pending')
+            ->get();
 
-        return back()->with('success', 'Pembayaran DP berhasil diverifikasi!');
+        // Update semua booking terkait
+        foreach ($relatedBookings as $relatedBooking) {
+            $relatedBooking->update([
+                'dp_status' => 'verified',
+                'dp_verified_at' => now(),
+            ]);
+        }
+
+        $bookingCount = $relatedBookings->count();
+        $message = $bookingCount > 1
+            ? "Pembayaran DP berhasil diverifikasi untuk {$bookingCount} booking!"
+            : 'Pembayaran DP berhasil diverifikasi!';
+
+        return back()->with('success', $message);
     }
 
     /**
@@ -213,12 +244,28 @@ class AdminBookingController extends Controller
             'rejection_reason.required' => 'Alasan penolakan harus diisi',
         ]);
 
-        $booking->update([
-            'dp_status' => 'rejected',
-            'dp_rejection_reason' => $validated['rejection_reason'],
-        ]);
+        // 🔥 FITUR BARU: Tolak semua booking terkait dengan bukti DP yang sama
+        $relatedBookings = Booking::where('user_id', $booking->user_id)
+            ->where('booking_date', $booking->booking_date)
+            ->where('booking_time', $booking->booking_time)
+            ->where('dp_payment_proof', $booking->dp_payment_proof)
+            ->where('dp_status', 'pending')
+            ->get();
 
-        return back()->with('success', 'Pembayaran DP ditolak. Customer akan diminta upload ulang.');
+        // Update semua booking terkait
+        foreach ($relatedBookings as $relatedBooking) {
+            $relatedBooking->update([
+                'dp_status' => 'rejected',
+                'dp_rejection_reason' => $validated['rejection_reason'],
+            ]);
+        }
+
+        $bookingCount = $relatedBookings->count();
+        $message = $bookingCount > 1
+            ? "Pembayaran DP ditolak untuk {$bookingCount} booking. Customer akan diminta upload ulang."
+            : 'Pembayaran DP ditolak. Customer akan diminta upload ulang.';
+
+        return back()->with('success', $message);
     }
 
     /**

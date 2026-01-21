@@ -98,8 +98,6 @@ class BookingController extends Controller
         // Hitung total harga dan DP untuk semua services
         $serviceIds = $validated['service_ids'];
         $services = Service::whereIn('id', $serviceIds)->get();
-        $totalPrice = $services->sum('price');
-        $dpAmount = $totalPrice * 0.5; // 50% DP dari total harga
 
         // Generate unique group ID untuk multiple bookings
         $bookingGroupId = 'BG-' . uniqid() . '-' . time();
@@ -107,6 +105,10 @@ class BookingController extends Controller
         // Create bookings untuk setiap service dalam satu grup
         $bookings = [];
         foreach ($serviceIds as $serviceId) {
+            // Cari service untuk mendapatkan harga individual
+            $service = Service::findOrFail($serviceId);
+            $individualDpAmount = $service->price * 0.5; // 50% DP dari harga layanan ini
+            
             $booking = Booking::create([
                 'user_id' => Auth::id(),
                 'service_id' => $serviceId,
@@ -116,7 +118,7 @@ class BookingController extends Controller
                 'booking_time' => $validated['booking_time'],
                 'notes' => $validated['notes'],
                 'status' => 'pending',
-                'dp_amount' => $dpAmount, // DP total dibagi ke semua booking dalam grup
+                'dp_amount' => $individualDpAmount, // DP berdasarkan harga layanan individual
                 'dp_status' => 'unpaid',
             ]);
             
@@ -294,15 +296,30 @@ class BookingController extends Controller
         // Upload file ke storage/app/public/dp_proofs
         $path = $request->file('dp_payment_proof')->store('dp_proofs', 'public');
 
-        // Update booking
-        $booking->update([
-            'dp_payment_proof' => $path,
-            'dp_status' => 'pending',
-            'dp_paid_at' => now(),
-            'dp_rejection_reason' => null, // Reset rejection reason
-        ]);
+        // 🔥 FITUR BARU: Share bukti DP ke semua booking yang dibuat bersamaan
+        // Cari semua booking dengan user yang sama, tanggal yang sama, dan waktu yang sama
+        $relatedBookings = Booking::where('user_id', $booking->user_id)
+            ->where('booking_date', $booking->booking_date)
+            ->where('booking_time', $booking->booking_time)
+            ->whereIn('dp_status', ['unpaid', 'rejected']) // Hanya yang belum upload atau ditolak
+            ->get();
 
-        return back()->with('success', 'Bukti pembayaran DP berhasil diupload. Menunggu verifikasi admin.');
+        // Update semua booking terkait dengan bukti DP yang sama
+        foreach ($relatedBookings as $relatedBooking) {
+            $relatedBooking->update([
+                'dp_payment_proof' => $path,
+                'dp_status' => 'pending',
+                'dp_paid_at' => now(),
+                'dp_rejection_reason' => null, // Reset rejection reason
+            ]);
+        }
+
+        $bookingCount = $relatedBookings->count();
+        $message = $bookingCount > 1 
+            ? "Bukti pembayaran DP berhasil diupload untuk {$bookingCount} booking. Menunggu verifikasi admin."
+            : 'Bukti pembayaran DP berhasil diupload. Menunggu verifikasi admin.';
+
+        return back()->with('success', $message);
     }
 
     /**

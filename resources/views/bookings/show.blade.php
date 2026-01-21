@@ -238,16 +238,34 @@
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
                                 <p class="text-sm text-gray-600">Total Harga</p>
-                                <p class="text-xl font-bold text-gray-800">{{ $booking->service->formatted_price }}</p>
+                                <p class="text-xl font-bold text-gray-800">
+                                    @if($booking->isGroupBooking())
+                                        Rp {{ number_format($booking->total_group_price, 0, ',', '.') }}
+                                    @else
+                                        {{ $booking->service->formatted_price }}
+                                    @endif
+                                </p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-600">DP yang Harus Dibayar (50%)</p>
-                                <p class="text-xl font-bold text-pink-600">{{ $booking->formatted_dp_amount }}</p>
+                                <p class="text-xl font-bold text-pink-600">
+                                    @if($booking->isGroupBooking())
+                                        {{ $booking->formatted_total_group_dp }}
+                                    @else
+                                        {{ $booking->formatted_dp_amount }}
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <div class="border-t pt-4">
                             <p class="text-sm text-gray-600">Sisa Pembayaran (dibayar saat datang)</p>
-                            <p class="text-2xl font-bold text-green-600">{{ $booking->remaining_payment }}</p>
+                            <p class="text-2xl font-bold text-green-600">
+                                @if($booking->isGroupBooking())
+                                    {{ $booking->group_remaining_payment }}
+                                @else
+                                    {{ $booking->remaining_payment }}
+                                @endif
+                            </p>
                         </div>
                     </div>
 
@@ -265,7 +283,15 @@
                                 <p><strong>Bank:</strong> BCA</p>
                                 <p><strong>No. Rekening:</strong> 1234567890</p>
                                 <p><strong>Atas Nama:</strong> Dsisi Salon</p>
-                                <p class="mt-2 text-sm text-blue-700">⚠️ Transfer tepat <strong>{{ $booking->formatted_dp_amount }}</strong> untuk mempermudah verifikasi</p>
+                                <p class="mt-2 text-sm text-blue-700">⚠️ Transfer tepat 
+                                    <strong>
+                                        @if($booking->isGroupBooking())
+                                            {{ $booking->formatted_total_group_dp }}
+                                        @else
+                                            {{ $booking->formatted_dp_amount }}
+                                        @endif
+                                    </strong> untuk mempermudah verifikasi
+                                </p>
                             </div>
                         </div>
                     @endif
