@@ -43,7 +43,7 @@
                         </svg>
                         {{ $booking->isGroupBooking() ? 'Paket Layanan' : 'Layanan' }}
                     </h2>
-                    
+
                     @if($booking->isGroupBooking())
                         <!-- Multiple Services Display -->
                         <div class="space-y-4">
@@ -61,7 +61,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                            
+
                             <!-- Total Price Summary -->
                             <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-6 border border-pink-200">
                                 <div class="flex justify-between items-center">
@@ -134,46 +134,46 @@
                                 <p class="text-lg font-semibold text-gray-800">{{ $booking->formatted_time }}</p>
                             </div>
                         </div>
-                        
+
                         <!-- Slot Availability Info -->
-                        <div class="mt-4 p-4 rounded-lg border-2 
-                            @if($slotInfo['is_full']) 
+                        <div class="mt-4 p-4 rounded-lg border-2
+                            @if($slotInfo['is_full'])
                                 bg-red-50 border-red-500
-                            @elseif($slotInfo['available'] <= 2) 
+                            @elseif($slotInfo['available'] <= 2)
                                 bg-yellow-50 border-yellow-500
-                            @else 
+                            @else
                                 bg-green-50 border-green-500
                             @endif">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="font-semibold 
-                                        @if($slotInfo['is_full']) 
+                                    <p class="font-semibold
+                                        @if($slotInfo['is_full'])
                                             text-red-700
-                                        @elseif($slotInfo['available'] <= 2) 
+                                        @elseif($slotInfo['available'] <= 2)
                                             text-yellow-700
-                                        @else 
+                                        @else
                                             text-green-700
                                         @endif">
                                         Ketersediaan Slot Waktu Ini:
                                     </p>
-                                    <p class="text-sm 
-                                        @if($slotInfo['is_full']) 
+                                    <p class="text-sm
+                                        @if($slotInfo['is_full'])
                                             text-red-600
-                                        @elseif($slotInfo['available'] <= 2) 
+                                        @elseif($slotInfo['available'] <= 2)
                                             text-yellow-600
-                                        @else 
+                                        @else
                                             text-green-600
                                         @endif">
                                         {{ $slotInfo['booked'] }} dari {{ $slotInfo['total'] }} slot terisi
                                     </p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-4xl font-bold 
-                                        @if($slotInfo['is_full']) 
+                                    <p class="text-4xl font-bold
+                                        @if($slotInfo['is_full'])
                                             text-red-600
-                                        @elseif($slotInfo['available'] <= 2) 
+                                        @elseif($slotInfo['available'] <= 2)
                                             text-yellow-600
-                                        @else 
+                                        @else
                                             text-green-600
                                         @endif">
                                         {{ $slotInfo['available'] }}
@@ -283,7 +283,7 @@
                                 <p><strong>Bank:</strong> BCA</p>
                                 <p><strong>No. Rekening:</strong> 1234567890</p>
                                 <p><strong>Atas Nama:</strong> Dsisi Salon</p>
-                                <p class="mt-2 text-sm text-blue-700">⚠️ Transfer tepat 
+                                <p class="mt-2 text-sm text-blue-700">⚠️ Transfer tepat
                                     <strong>
                                         @if($booking->isGroupBooking())
                                             {{ $booking->formatted_total_group_dp }}

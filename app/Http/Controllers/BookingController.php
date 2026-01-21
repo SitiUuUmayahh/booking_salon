@@ -108,7 +108,7 @@ class BookingController extends Controller
             // Cari service untuk mendapatkan harga individual
             $service = Service::findOrFail($serviceId);
             $individualDpAmount = $service->price * 0.5; // 50% DP dari harga layanan ini
-            
+
             $booking = Booking::create([
                 'user_id' => Auth::id(),
                 'service_id' => $serviceId,
@@ -121,7 +121,7 @@ class BookingController extends Controller
                 'dp_amount' => $individualDpAmount, // DP berdasarkan harga layanan individual
                 'dp_status' => 'unpaid',
             ]);
-            
+
             $bookings[] = $booking;
         }
 
@@ -139,28 +139,28 @@ class BookingController extends Controller
         // Ambil booking milik user yang login, dengan relasi service
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         // Group bookings by booking_group_id atau individual booking
         $allBookings = $user
             ->bookings()
             ->with('service')
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
         // Group berdasarkan booking_group_id
         $groupedBookings = [];
         $processedGroups = [];
-        
+
         foreach ($allBookings as $booking) {
             if ($booking->booking_group_id && !in_array($booking->booking_group_id, $processedGroups)) {
                 // Group booking - ambil sebagai group
                 $groupBookings = $allBookings->where('booking_group_id', $booking->booking_group_id)->values();
-                
+
                 // Hitung total untuk group
                 $totalPrice = $groupBookings->sum(function($b) {
                     return $b->service->price;
                 });
-                
+
                 $groupedBookings[] = [
                     'is_group' => true,
                     'group_id' => $booking->booking_group_id,
@@ -181,15 +181,15 @@ class BookingController extends Controller
                 ];
             }
         }
-        
+
         // Sort by created_at dan convert ke collection
         $bookings = collect($groupedBookings)->sortByDesc('created_at')->values();
-        
+
         // Manual pagination
         $currentPage = request()->get('page', 1);
         $perPage = 10;
         $offset = ($currentPage - 1) * $perPage;
-        
+
         $paginatedItems = $bookings->slice($offset, $perPage)->values();
         $paginatedBookings = new \Illuminate\Pagination\LengthAwarePaginator(
             $paginatedItems,
@@ -315,7 +315,7 @@ class BookingController extends Controller
         }
 
         $bookingCount = $relatedBookings->count();
-        $message = $bookingCount > 1 
+        $message = $bookingCount > 1
             ? "Bukti pembayaran DP berhasil diupload untuk {$bookingCount} booking. Menunggu verifikasi admin."
             : 'Bukti pembayaran DP berhasil diupload. Menunggu verifikasi admin.';
 
@@ -339,8 +339,8 @@ class BookingController extends Controller
         return response()->json([
             'success' => true,
             'data' => $slotInfo,
-            'message' => $slotInfo['is_full'] 
-                ? "Slot penuh ({$slotInfo['booked']}/{$slotInfo['total']})" 
+            'message' => $slotInfo['is_full']
+                ? "Slot penuh ({$slotInfo['booked']}/{$slotInfo['total']})"
                 : "{$slotInfo['available']} slot tersedia dari {$slotInfo['total']}"
         ]);
     }
