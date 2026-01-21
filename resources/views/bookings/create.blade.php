@@ -25,7 +25,7 @@
             <div class="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-8">
                 <h1 class="text-3xl font-bold">Buat Booking Baru</h1>
                 <p class="text-pink-100 mt-2">Lengkapi form di bawah untuk booking layanan</p>
-                
+
 
             </div>
 
@@ -40,14 +40,14 @@
                             Pilih Layanan <span class="text-red-500">*</span>
                         </label>
                         <p class="text-sm text-gray-500 mb-4">(Anda bisa memilih beberapa layanan sekaligus, maksimal 3 layanan dalam 1 hari)</p>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($services as $svc)
                                 <div class="service-card border-2 border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer">
                                     <label class="flex items-start cursor-pointer">
-                                        <input type="checkbox" 
-                                               name="service_ids[]" 
-                                               value="{{ $svc->id }}" 
+                                        <input type="checkbox"
+                                               name="service_ids[]"
+                                               value="{{ $svc->id }}"
                                                class="service-checkbox mt-1 mr-3 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                                                onchange="updateSelectedServices()"
                                                {{ $service && $service->id === $svc->id ? 'checked' : '' }}>
@@ -63,7 +63,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        
+
                         <!-- Selected Services Summary -->
                         <div id="selected-summary" class="mt-4 p-4 bg-purple-50 rounded-lg border hidden">
                             <h4 class="font-semibold text-purple-800 mb-2">Layanan yang Dipilih:</h4>
@@ -78,7 +78,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         @error('service_ids')
                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                         @enderror
@@ -281,7 +281,7 @@ function updateSelectedServices() {
     const listDiv = document.getElementById('selected-list');
     const totalPriceSpan = document.getElementById('total-price');
     const dpAmountSpan = document.getElementById('dp-amount');
-    
+
     // Update service cards visual feedback
     document.querySelectorAll('.service-card').forEach(card => {
         const checkbox = card.querySelector('.service-checkbox');
@@ -293,23 +293,23 @@ function updateSelectedServices() {
             card.classList.add('border-gray-200');
         }
     });
-    
+
     if (checkboxes.length === 0) {
         summaryDiv.classList.add('hidden');
         return;
     }
-    
+
     // Show summary
     summaryDiv.classList.remove('hidden');
-    
+
     // Build selected services list
     let totalPrice = 0;
     let servicesHtml = '';
-    
+
     checkboxes.forEach(checkbox => {
         const serviceId = checkbox.value;
         const service = servicesData[serviceId];
-        
+
         if (service) {
             totalPrice += service.price;
             servicesHtml += `
@@ -320,7 +320,7 @@ function updateSelectedServices() {
             `;
         }
     });
-    
+
     // Update display
     listDiv.innerHTML = servicesHtml;
     totalPriceSpan.textContent = new Intl.NumberFormat('id-ID', {
@@ -328,10 +328,10 @@ function updateSelectedServices() {
         currency: 'IDR',
         minimumFractionDigits: 0
     }).format(totalPrice);
-    
+
     const dpAmount = totalPrice / 2;
     dpAmountSpan.textContent = new Intl.NumberFormat('id-ID', {
-        style: 'currency', 
+        style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
     }).format(dpAmount);
