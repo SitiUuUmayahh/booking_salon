@@ -86,8 +86,16 @@ class Booking extends Model
 
     public function getRemainingPaymentAttribute()
     {
-        $totalPrice = $this->service->price ?? 0;
-        $remaining = $totalPrice - $this->dp_amount;
+        // Untuk group booking, gunakan total_group_price dan total_group_dp
+        // Untuk single booking, gunakan service->price dan dp_amount
+        if ($this->isGroupBooking()) {
+            $totalPrice = $this->total_group_price;
+            $dpPaid = $this->total_group_dp;
+        } else {
+            $totalPrice = $this->service->price ?? 0;
+            $dpPaid = $this->dp_amount;
+        }
+        $remaining = $totalPrice - $dpPaid;
         return 'Rp ' . number_format($remaining, 0, ',', '.');
     }
 
