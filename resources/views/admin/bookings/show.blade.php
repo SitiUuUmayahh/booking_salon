@@ -298,7 +298,7 @@
                     </h3>
                 </div>
                 <div class="p-4">
-                    <a href="{{ $booking->whatsapp_admin_link }}" target="_blank" 
+                    <a href="{{ $booking->whatsapp_admin_link }}" target="_blank"
                        class="w-full block bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold py-3.5 px-4 rounded-lg transition transform hover:scale-102 shadow-lg text-center">
                         <span class="flex items-center justify-center">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -362,7 +362,7 @@
                 @if($booking->status !== 'completed')
                     <form method="POST" action="{{ route('admin.bookings.cancel', $booking->id) }}">
                         @csrf
-                        <button type="submit" onclick="return confirm('Yakin ingin batalkan booking ini?')" 
+                        <button type="submit" onclick="return confirm('Yakin ingin batalkan booking ini?')"
                                 class="w-full bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-semibold py-3 px-4 rounded-lg transition shadow">
                             <span class="flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,7 +378,7 @@
                     <form method="POST" action="{{ route('admin.bookings.destroy', $booking->id) }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" onclick="return confirm('Yakin ingin hapus booking ini?')" 
+                        <button type="submit" onclick="return confirm('Yakin ingin hapus booking ini?')"
                                 class="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition">
                             <span class="flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
