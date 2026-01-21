@@ -36,10 +36,10 @@
 
                     <!-- Service Selection -->
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">
                             Pilih Layanan <span class="text-red-500">*</span>
-                            <span class="text-sm font-normal text-gray-500">(Anda bisa memilih beberapa layanan sekaligus)</span>
                         </label>
+                        <p class="text-sm text-gray-500 mb-4">(Anda bisa memilih beberapa layanan sekaligus, maksimal 3 layanan dalam 1 hari)</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach($services as $svc)
