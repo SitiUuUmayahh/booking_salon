@@ -10,8 +10,13 @@ class WhatsAppService
      * Format nomor WhatsApp ke format international (tanpa +)
      * Format untuk wa.me: hanya angka, tanpa + atau karakter lain
      */
-    public static function formatNumber(string $number): string
+    public static function formatNumber(?string $number): string
     {
+        // Jika null atau kosong, gunakan default admin number
+        if (empty($number)) {
+            $number = config('services.whatsapp.admin_number', '6285123456789');
+        }
+        
         // Hapus semua karakter kecuali angka
         $number = preg_replace('/[^0-9]/', '', $number);
         
