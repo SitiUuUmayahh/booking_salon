@@ -90,11 +90,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Helper: Cek jumlah booking hari ini
+     * Helper: Cek jumlah booking aktif hari ini (excluding cancelled)
      */
     public function getTodayBookingsCountAttribute()
     {
-        return $this->bookings()->whereDate('created_at', \Carbon\Carbon::today())->count();
+        return $this->bookings()
+            ->whereDate('created_at', \Carbon\Carbon::today())
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->count();
     }
 
     /**
@@ -111,5 +114,13 @@ class User extends Authenticatable
     public function getRemainingTodayBookingsAttribute()
     {
         return max(0, 3 - $this->today_bookings_count);
+    }
+
+    /**
+     * Helper: Cek apakah user masih bisa melakukan booking setelah pembatalan
+     */
+    public function canBookAfterCancellation()
+    {
+        return $this->remaining_today_bookings > 0;
     }
 }

@@ -17,6 +17,33 @@
             <p class="text-gray-600">Kelola dan lihat semua riwayat booking Anda</p>
         </div>
 
+        <!-- Special call-to-action after cancellation -->
+        @if(session('show_booking_button'))
+            <div class="mb-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">✨ Siap untuk Booking Lagi? ✨</h3>
+                            <p class="text-green-100">Booking Anda telah dibatalkan. Sekarang Anda bisa memilih layanan lain yang sesuai dengan kebutuhan Anda!</p>
+                            @auth
+                                @if(Auth::user()->remaining_today_bookings > 0)
+                                    <p class="text-xs text-green-100 mt-1">Sisa quota booking hari ini: <strong>{{ Auth::user()->remaining_today_bookings }}</strong></p>
+                                @endif
+                            @endauth
+                        </div>
+                        <div class="ml-4">
+                            <a href="{{ route('dashboard') }}" class="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Mulai Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if($paginatedBookings->count() > 0)
             <!-- Bookings List -->
             <div class="space-y-4">
@@ -109,6 +136,15 @@
                                                     </button>
                                                 </form>
                                             @endif
+                                            @if($bookingGroup['bookings'][0]->status === 'completed')
+                                                <a href="{{ route('dashboard') }}" 
+                                                   class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                    </svg>
+                                                    Booking Lagi
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -192,6 +228,16 @@
                                                         Batal
                                                     </button>
                                                 </form>
+                                            @endif
+
+                                            @if($booking->status === 'completed')
+                                                <a href="{{ route('bookings.create', ['service_id' => $booking->service->id]) }}" 
+                                                   class="inline-flex items-center justify-center px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition duration-200 shadow-sm">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                    </svg>
+                                                    Booking Lagi
+                                                </a>
                                             @endif
                                         </div>
                                     </div>

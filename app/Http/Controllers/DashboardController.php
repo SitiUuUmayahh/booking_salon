@@ -35,6 +35,10 @@ class DashboardController extends Controller
             ->orderBy('booking_date', 'desc')
             ->get();
         
-        return view('dashboard', compact('services', 'bookings'));
+        // Informasi tentang sisa slot booking hari ini
+        $remainingBookings = $user->remaining_today_bookings;
+        $hasReachedLimit = $user->hasReachedDailyBookingLimit();
+        
+        return view('dashboard', compact('services', 'bookings', 'remainingBookings', 'hasReachedLimit'));
     }
 }

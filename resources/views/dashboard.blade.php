@@ -14,6 +14,27 @@
                 <div>
                     <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
                     <p class="text-pink-100">Pilih layanan yang Anda inginkan dan buat booking sekarang!</p>
+                    
+                    <!-- Booking Quota Info -->
+                    @if(!$hasReachedLimit)
+                        <div class="mt-4 bg-white bg-opacity-20 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm">Anda masih bisa melakukan <strong>{{ $remainingBookings }}</strong> booking lagi hari ini</span>
+                            </div>
+                        </div>
+                    @else
+                        <div class="mt-4 bg-red-500 bg-opacity-30 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <span class="text-sm">Anda sudah mencapai batas maksimal 3 booking per hari. Silakan coba lagi besok.</span>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

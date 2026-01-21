@@ -236,7 +236,23 @@ class BookingController extends Controller
             ]);
         }
 
-        $booking->update(['status' => 'cancelled']);
+        // Cek apakah ini adalah booking group
+        $isGroupBooking = !is_null($booking->booking_group_id);
+        $cancelledCount = 1;
+
+        if ($isGroupBooking) {
+            // Batalkan semua booking dalam group yang sama
+            $groupBookings = Booking::where('booking_group_id', $booking->booking_group_id)
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->get();
+            
+            foreach ($groupBookings as $groupBooking) {
+                $groupBooking->update(['status' => 'cancelled']);
+            }
+            $cancelledCount = $groupBookings->count();
+        } else {
+            $booking->update(['status' => 'cancelled']);
+        }
 
         // 🔒 ANTI-SPAM: Track cancel count
         /** @var \App\Models\User $user */
@@ -258,11 +274,18 @@ class BookingController extends Controller
         if ($user->cancel_count >= 3) {
             $remaining = 5 - $user->cancel_count;
             return redirect()->route('bookings.history')
-                ->with('warning', "Booking dibatalkan. PERINGATAN: Anda telah membatalkan {$user->cancel_count}x. Jika membatalkan {$remaining}x lagi, akun akan di-suspend.");
+                ->with('warning', "Booking dibatalkan. PERINGATAN: Anda telah membatalkan {$user->cancel_count}x. Jika membatalkan {$remaining}x lagi, akun akan di-suspend.")
+                ->with('show_booking_button', true);
         }
 
+        $remainingBookings = $user->remaining_today_bookings;
+        $message = $isGroupBooking 
+            ? "Booking berhasil dibatalkan ({$cancelledCount} layanan). Anda masih bisa melakukan {$remainingBookings} booking lagi hari ini."
+            : "Booking berhasil dibatalkan. Anda masih bisa melakukan {$remainingBookings} booking lagi hari ini.";
+
         return redirect()->route('bookings.history')
-            ->with('success', 'Booking berhasil dibatalkan');
+            ->with('success', $message)
+            ->with('show_booking_button', true);
     }
 
     /**
